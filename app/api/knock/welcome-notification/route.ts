@@ -5,20 +5,26 @@ const knockClient = new Knock(process.env.NEXT_PUBLIC_KNOCK_SECRET_KEY);
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, name, email, actionUrl } = await req.json();
+    const {
+      recipient_userId,
+      recipient_email,
+      recipient_username,
+      username,
+      primary_action_url,
+    } = await req.json();
 
     const workflowRun = await knockClient.workflows.trigger("bzFTqdaK_cZV", {
       recipients: [
         {
-          id: userId,
-          name,
-          email,
-          primary_action_url: actionUrl,
+          id: recipient_userId,
+          name: recipient_username,
+          email: recipient_email,
         },
       ],
       data: {
-        username: name,
+        username,
         sitename: "NowNet",
+        primary_action_url,
       },
     });
 

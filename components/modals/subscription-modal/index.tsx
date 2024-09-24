@@ -130,29 +130,16 @@ const SubscriptionModal = () => {
         status: "pending",
       });
 
-      // TODO:
-      // Email Notifications (to owner - and super admin)
-      await axios.post(`/api/mail`, {
-        email: [selectedNetwork.owner?.email, "info.gasiapp@gmail.com"],
-        subject: `${activeUser.name} is requesting to connect to your wifi Network`,
-        message: `
-        <p>Wifi: ${selectedNetwork.name}</p>
-        <p>Device Name: ${selectedDevice.name}</p>
-        <p>Device Mac Address: ${selectedDevice.macAddress}</p>
-        <br />
-        <br />
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}">Check Request</a>
-        `,
-      });
-
+      // Email Notifications to owner
       await axios.post(`/api/knock/new-connection-notification`, {
+        recipient_userId: selectedNetwork.owner?._id,
+        recipient_email: selectedNetwork.owner?.email,
+        recipient_username: selectedNetwork.owner?.name,
+
         username: activeUser.name,
         macaddress: selectedDevice.macAddress,
         wifiname: selectedNetwork.name,
-        userId: selectedNetwork.owner?._id,
-        name: activeUser,
-        email: selectedNetwork.owner?.email,
-        actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
       });
 
       // success

@@ -94,10 +94,11 @@ const NewUserComponent = ({
       });
 
       await axios.post(`/api/knock/welcome-notification`, {
-        userId,
-        email,
-        name: `${firstname} ${lastname}`,
-        actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/app`,
+        recipient_userId: userId,
+        recipient_email: email,
+        recipient_username: `${firstname} ${lastname}`,
+        username: `${firstname} ${lastname}`,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app`,
       });
 
       toast.success(`Signed up successfully.`, {

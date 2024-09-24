@@ -58,16 +58,28 @@ export function DataTableRowActions<TData>({
 
       // TODO:
       // Email Notifications (to user and super admin)
-      await axios.post(`/api/mail`, {
-        email: [subscription.user?.email!, "info.gasiapp@gmail.com"],
-        subject: `Network ${subscription.wifi?.name} has been connected`,
-        message: `
-        <p>Wifi: ${subscription.wifi?.name}</p>
-        <p>Device Name: ${subscription.device?.name}</p>
-        <p>Device Mac Address: ${subscription.device?.macAddress}</p>
-        <br />
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions">Check Subscriptions</a>
-        `,
+      // await axios.post(`/api/mail`, {
+      //   email: [subscription.user?.email!, "info.gasiapp@gmail.com"],
+      //   subject: `Network ${subscription.wifi?.name} has been connected`,
+      //   message: `
+      //   <p>Wifi: ${subscription.wifi?.name}</p>
+      //   <p>Device Name: ${subscription.device?.name}</p>
+      //   <p>Device Mac Address: ${subscription.device?.macAddress}</p>
+      //   <br />
+      //   <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions">Check Subscriptions</a>
+      //   `,
+      // });
+
+      // Email Notifications to user
+      await axios.post(`/api/knock/device-connected-notification`, {
+        recipient_userId: subscription.user?._id,
+        recipient_email: subscription.user?.email,
+        recipient_username: subscription.user?.name,
+
+        devicename: subscription.device?.name,
+        macaddress: subscription.device?.macAddress,
+        wifiname: subscription.wifi?.name,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions`,
       });
 
       // success

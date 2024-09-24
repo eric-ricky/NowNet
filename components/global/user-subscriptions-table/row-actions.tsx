@@ -70,16 +70,29 @@ export function DataTableRowActions<TData>({
 
       // TODO:
       // Email Notifications (to wifi owner and super admin)
-      await axios.post(`/api/mail`, {
-        email: [owner?.email, "info.gasiapp@gmail.com"],
-        subject: `Disconnect ${subscription.user?.name}'s ${subscription.device?.name} from ${subscription.wifi?.name}`,
-        message: `
-        <p>Wifi: ${subscription.wifi?.name}</p>
-        <p>Device Name: ${subscription.device?.name}</p>
-        <p>Device Mac Address: ${subscription.device?.macAddress}</p>
-        <br />
-        <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}">Check Subscription</a>
-        `,
+      // await axios.post(`/api/mail`, {
+      //   email: [owner?.email, "info.gasiapp@gmail.com"],
+      //   subject: `Disconnect ${subscription.user?.name}'s ${subscription.device?.name} from ${subscription.wifi?.name}`,
+      //   message: `
+      //   <p>Wifi: ${subscription.wifi?.name}</p>
+      //   <p>Device Name: ${subscription.device?.name}</p>
+      //   <p>Device Mac Address: ${subscription.device?.macAddress}</p>
+      //   <br />
+      //   <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}">Check Subscription</a>
+      //   `,
+      // });
+
+      // Notification to network owner
+      await axios.post(`/api/knock/disconnection-request-notification`, {
+        recipient_userId: owner?._id,
+        recipient_email: owner?.email,
+        recipient_username: owner?.name,
+
+        macaddress: subscription.device?.macAddress,
+        wifiname: subscription.wifi?.name,
+        username: subscription.user?.name,
+        devicename: subscription.device?.name,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}`,
       });
 
       // success

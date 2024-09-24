@@ -9,14 +9,16 @@ export async function POST(req: NextRequest) {
       recipient_userId,
       recipient_email,
       recipient_username,
+
       macaddress,
       primary_action_url,
       wifiname,
       username,
+      devicename,
     } = await req.json();
 
     const workflowRun = await knockClient.workflows.trigger(
-      "new-connection-request",
+      "disconnection-request",
       {
         recipients: [
           {
@@ -26,6 +28,7 @@ export async function POST(req: NextRequest) {
           },
         ],
         data: {
+          devicename,
           macaddress,
           primary_action_url,
           username,
