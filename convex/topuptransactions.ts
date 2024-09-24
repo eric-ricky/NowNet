@@ -54,6 +54,23 @@ export const createTopupTransaction = mutation({
   },
 });
 
+export const deleteTopupTransaction = mutation({
+  args: {
+    id: v.id("topuptransactions"),
+  },
+  handler: async ({ db, auth }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
+
+    const { id } = args;
+
+    const existingTransaction = await db.get(id);
+    if (!existingTransaction) throw new ConvexError("Transaction not found!");
+
+    await db.delete(id);
+  },
+});
+
 export const updateTopupTransaction = mutation({
   args: {
     id: v.id("topuptransactions"),
