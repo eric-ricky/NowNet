@@ -57,3 +57,5 @@ export const adminSidebarLinks = [
     label: "Payments",
   },
 ];
+
+export const containerDivStyles = `max-xl:max-h-screen max-xl::overflow-y-auto !overflow-x-hidden no-scrollbar`;

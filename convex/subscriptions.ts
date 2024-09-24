@@ -142,7 +142,7 @@ export const getTotalSpentByUser = query({
     const subscriptions = await db
       .query("subscriptions")
       .withIndex("by_user", (q) => q.eq("user", user))
-      .filter((q) => q.eq(q.field("isActive"), true))
+      // .filter((q) => q.eq(q.field("isActive"), true))
       .collect();
 
     const totalSpent = subscriptions.reduce(

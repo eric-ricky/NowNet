@@ -1,13 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Axe, MonitorSmartphone, Phone, Plus } from "lucide-react";
-import React from "react";
-import DevicesTable from "./_components/devices-table";
-import { useDeviceModal } from "@/hooks/modal-state/use-device-modal";
-import useActiveUser from "@/hooks/db/use-active-user";
-import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
+import useActiveUser from "@/hooks/db/use-active-user";
+import { useDeviceModal } from "@/hooks/modal-state/use-device-modal";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
+import { useQuery } from "convex/react";
+import { MonitorSmartphone, Plus } from "lucide-react";
+import DevicesTable from "./_components/devices-table";
 
 const DevicesPage = () => {
   const { onOpen: onOpenDeviceModal, setDevice } = useDeviceModal();
@@ -22,7 +23,7 @@ const DevicesPage = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col", containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

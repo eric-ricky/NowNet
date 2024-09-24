@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { useNetworkModal } from "@/hooks/modal-state/use-network-modal";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { Plus, Wifi } from "lucide-react";
 
@@ -25,7 +27,7 @@ const NetworksPage = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col", containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

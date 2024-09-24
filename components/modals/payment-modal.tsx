@@ -163,7 +163,7 @@ const PaymentModal = () => {
         {redirectUrl && (
           <iframe
             src={redirectUrl}
-            className="w-full h-full min-h-[75vh]"
+            className="w-full h-full min-h-[70vh]"
           ></iframe>
         )}
 

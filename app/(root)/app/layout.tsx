@@ -34,39 +34,29 @@ const MainLayout = async ({ children }: PropsWithChildren) => {
     );
 
   return (
-    <>
-      <div className="flex h-screen w-full font-inter overflow-hidden">
-        <Sidebar user={userData} />
+    <div className="flex h-screen w-full font-inter !overflow-hidden">
+      <Sidebar user={userData} />
 
-        <div className="flex flex-col size-full overflow-hidden max-h-screen">
-          <div className="border-b border-t px-5 py-5 h-16 flex items-center">
-            <div className="flex md:hidden">
-              <Logo />
-            </div>
-
-            <div className="ml-auto flex items-center space-x-4">
-              <NotificationFeed />
-
-              <UserButton />
-
-              <div className="flex md:hidden">
-                <MobileNav />
-              </div>
-            </div>
+      <div className="flex flex-col size-full overflow-hidden max-h-screen">
+        <div className="border-b border-t px-5 py-5 h-16 flex items-center">
+          <div className="flex md:hidden">
+            <Logo />
           </div>
 
-          <div className=" h-16 items-center justify-between p-5 sm:p-8 hidden">
-            <Logo />
+          <div className="ml-auto flex items-center space-x-4">
+            <NotificationFeed />
 
-            <div>
+            <UserButton />
+
+            <div className="flex md:hidden">
               <MobileNav />
             </div>
           </div>
-
-          {children}
         </div>
+
+        {children}
       </div>
-    </>
+    </div>
   );
 };
 

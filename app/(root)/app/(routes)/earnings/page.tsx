@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card";
 import useTotalEarnings from "@/hooks/db/use-total-earnings";
 import useUpcomingEarnings from "@/hooks/db/use-upcoming-earnings";
+import { containerDivStyles } from "@/lib/data";
 import { cn, formatToKES, getNextPaymentDate } from "@/lib/utils";
 import { ArrowUp, Banknote, CreditCard } from "lucide-react";
 import EarningsHistory from "./_components/earnings-history";
@@ -18,7 +19,7 @@ const EarningsPage = () => {
   const { totalEarning } = useTotalEarnings();
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col", containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

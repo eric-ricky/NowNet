@@ -13,6 +13,8 @@ import { Separator } from "@/components/ui/separator";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { useSubscriptionModal } from "@/hooks/modal-state/use-subscription-modal";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { CreditCard, ListChecks, Loader2, Plus } from "lucide-react";
 
@@ -37,7 +39,7 @@ const SubscriptionsPage = () => {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col ", containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

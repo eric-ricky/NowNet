@@ -14,7 +14,6 @@ import useActiveUser from "@/hooks/db/use-active-user";
 import { formatToKES } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { CreditCard, Wallet } from "lucide-react";
-import Image from "next/image";
 
 const HomeContent = () => {
   const { activeUser } = useActiveUser();
@@ -86,10 +85,6 @@ const HomeContent = () => {
               subscriptions={subscriptions || []}
               loading={!subscriptions}
             />
-            <div className="text-slate-00 text-sm px-4 hidden lex flex-col items-center">
-              <Image src={"/images/soon.png"} alt="." width={40} height={40} />
-              <span>Coming Soon</span>
-            </div>
           </CardContent>
         </Card>
       </div>

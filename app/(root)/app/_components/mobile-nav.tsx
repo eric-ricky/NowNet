@@ -11,8 +11,7 @@ import {
 } from "@/components/ui/sheet";
 import { sidebarLinks } from "@/lib/data";
 import { cn } from "@/lib/utils";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import { LogOut, Menu, X } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -39,13 +38,14 @@ const MobileNav = () => {
             mobile nav description
           </SheetDescription>
 
-          <div className="flex flex-col justify-between overflow-y-auto h-[calc(100vh-72px)]">
+          <div className="flex flex-col justify-between overflow-y-auto h-[calc(100vh-72px)] p-0">
             <SheetClose asChild>
-              <nav className="flex flex-col gap-6 pt-16 h-full">
+              <nav className="flex flex-col gap-6 pt-8 h-full">
                 {sidebarLinks.map((item) => {
                   const isActive =
                     pathname === item.route ||
-                    pathname.startsWith(`${item.route}/`);
+                    (item.route !== "/app" &&
+                      pathname.startsWith(`${item.route}`));
 
                   return (
                     <SheetClose asChild key={item.route}>
@@ -53,7 +53,7 @@ const MobileNav = () => {
                         href={item.route}
                         key={item.label}
                         className={cn(
-                          "flex items-center gap-3 p-4 rounded-lg max-w-60 w-full",
+                          "flex items-center gap-3 p-4 rounded-lg w-full",
                           {
                             "bg-bank-gradient text-white": isActive,
                             "hover:bg-slate-100 text-black-2": !isActive,
@@ -78,10 +78,6 @@ const MobileNav = () => {
                     role="button"
                     className={cn(
                       "flex items-center gap-3 p-4 rounded-lg max-w-60 w-full text-black-2 hover:bg-bank-gradient hover:text-white"
-                      // {
-                      //   "bg-bank-gradient text-white": isActive,
-                      //   "hover:bg-slate-100 text-black-2": !isActive,
-                      // }
                     )}
                   >
                     <LogOut />

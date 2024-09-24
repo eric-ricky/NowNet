@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
-import { formatToKES } from "@/lib/utils";
+import { containerDivStyles } from "@/lib/data";
+import { cn, formatToKES } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { ArrowUp, CreditCard, Wallet } from "lucide-react";
 
@@ -24,7 +25,9 @@ const WalletPage = () => {
   });
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto">
+    <div
+      className={cn("flex flex-col h-full overflow-y-auto", containerDivStyles)}
+    >
       <div className="border-b border-t">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

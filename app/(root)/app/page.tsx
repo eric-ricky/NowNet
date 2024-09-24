@@ -1,5 +1,7 @@
 import RightSidebar from "@/components/sections/right-sidebar";
 import { api } from "@/convex/_generated/api";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
 import { currentUser } from "@clerk/nextjs/server";
 import { ConvexHttpClient } from "convex/browser";
 import { Loader2 } from "lucide-react";
@@ -23,7 +25,7 @@ const HomePage = async () => {
     );
 
   return (
-    <div className="w-full flex flex-row max-xl:max-h-screen max-xl::overflow-y-auto no-scrollbar">
+    <div className={cn("w-full flex flex-row", containerDivStyles)}>
       <HomeContent />
       <RightSidebar user={userData} />
     </div>

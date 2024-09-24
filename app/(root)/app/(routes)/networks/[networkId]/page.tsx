@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { ChevronLeft, CreditCard, Loader2, TriangleAlert } from "lucide-react";
 import Link from "next/link";
@@ -26,7 +28,7 @@ const NetworkDetailsPage = ({ params }: { params: { networkId: string } }) => {
   });
 
   return (
-    <div className="flex flex-col max-h-screen">
+    <div className={cn("flex flex-col max-h-screen", containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <Link

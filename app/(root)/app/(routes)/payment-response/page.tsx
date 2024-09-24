@@ -9,6 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { containerDivStyles } from "@/lib/data";
+import { cn } from "@/lib/utils";
 import axios from "axios";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -59,7 +61,7 @@ const PaymentResponsePage = () => {
   }, [orderTrackingId, orderMerchantReference]);
 
   return (
-    <div className="flex flex-col">
+    <div className={cn("flex flex-col", containerDivStyles)}>
       <div className="border-b border-t">
         <div className="flex h-16 items-center px-4 md:px-8">
           <Link href="/app" className="w-fit">
