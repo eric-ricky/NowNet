@@ -58,6 +58,14 @@ export const deleteDevice = mutation({
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
+    // check subscriptions
+    const subscription = await db
+      .query("subscriptions")
+      .filter((q) => q.eq(q.field("device"), args.id))
+      .first();
+    if (subscription)
+      throw new ConvexError("Cannot delete device with subscriptions");
+
     await db.delete(args.id);
   },
 });

@@ -1,14 +1,18 @@
 "use client";
 
-import { Doc } from "@/convex/_generated/dataModel";
+import { api } from "@/convex/_generated/api";
+import useActiveUser from "@/hooks/db/use-active-user";
 import { useDeviceModal } from "@/hooks/modal-state/use-device-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
+import { Loader } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
@@ -26,11 +30,6 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import { Loader } from "lucide-react";
-import useActiveUser from "@/hooks/db/use-active-user";
-import { useMutation } from "convex/react";
-import { api } from "@/convex/_generated/api";
 
 const FormSchema = z.object({
   macAddress: z.string().min(1, "Mac Address is required"),
@@ -79,7 +78,7 @@ const DeviceModal = () => {
     try {
       const { name, macAddress } = formData;
       if (!device) {
-        const newDeviceId = await createDevice({
+        await createDevice({
           name,
           macAddress,
           user: activeUser._id,
@@ -158,7 +157,7 @@ const DeviceModal = () => {
 
                 <FormField
                   control={form.control}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!device}
                   name="macAddress"
                   render={({ field }) => (
                     <FormItem>

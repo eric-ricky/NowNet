@@ -17,7 +17,6 @@ import { Row } from "@tanstack/react-table";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Copy, Edit, MoreHorizontal, Trash } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -68,7 +67,7 @@ export function DataTableRowActions<TData>({
       const errorMsg =
         error instanceof ConvexError ? error.data : `Error deleting device`;
       toast.error(errorMsg, {
-        id: "toastId",
+        id: toastId,
         style: {
           color: "red",
         },
