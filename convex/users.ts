@@ -34,6 +34,26 @@ export const createUser = mutation({
   },
 });
 
+export const getAllUsersAdmin = query({
+  args: {
+    adminEmail: v.optional(v.string()),
+  },
+  handler: async ({ db }, args) => {
+    const { adminEmail } = args;
+    if (!adminEmail) return [];
+
+    const admin = await db
+      .query("admins")
+      .filter((q) => q.eq(q.field("email"), adminEmail))
+      .first();
+    if (!admin) return [];
+
+    const users = await db.query("users").collect();
+
+    return users;
+  },
+});
+
 export const getUser = query({
   args: {
     email: v.optional(v.string()),

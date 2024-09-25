@@ -17,14 +17,4 @@ crons.interval(
   internal.users.checkIfUserHasJuice
 );
 
-// process wifi_owners earnings (every Monday at 00:00)
-// crons.cron("process earnings", "0 0 * * 1", internal.earnings.processEarnings);
-// crons.interval(
-//   "process earnings",
-//   {
-//     minutes: 10,
-//   },
-//   internal.earnings.processEarnings
-// );
-
 export default crons;

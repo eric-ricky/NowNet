@@ -42,7 +42,7 @@ export default function RootLayout({
         />
 
         <ConvexClientProvider>
-          <div>
+          {/* <div>
             <section className="bg-gray-900 text-white">
               <div className="mx-auto max-w-screen-xl px-4 py-32 lg:flex lg:h-screen lg:items-center">
                 <div className="mx-auto max-w-3xl text-center">
@@ -66,7 +66,9 @@ export default function RootLayout({
               </div>
             </section>
             <div className="hidden">{children}</div>
-          </div>
+          </div> */}
+
+          {children}
 
           <Toaster />
           <ModalProvider />

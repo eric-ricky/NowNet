@@ -27,7 +27,7 @@ const NetworksPage = () => {
   };
 
   return (
-    <div className={cn("flex flex-col", containerDivStyles)}>
+    <div className={cn(containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">

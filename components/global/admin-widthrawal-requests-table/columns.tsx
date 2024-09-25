@@ -22,6 +22,10 @@ import { DataTableRowActions } from "./row-actions";
 //   payment_method: string;
 //   payment_status_description: string;
 
+// const d:Doc<'widthrawaltransactions'> = {
+//   _creationTime,_id,currency,description,payment_account,payment_method,payment_status_description,total_amount,total_payable,transaction_cost,user
+// }
+
 export const columns: ColumnDef<IWidthrawalRequestsData>[] = [
   {
     id: "select",
@@ -69,17 +73,6 @@ export const columns: ColumnDef<IWidthrawalRequestsData>[] = [
     },
   },
   {
-    accessorKey: "currency",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Currency" />
-    ),
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap px-4 py-2 text-gray-700">
-        {row.getValue("currency")}
-      </div>
-    ),
-  },
-  {
     accessorKey: "payment_account",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Pay To" />
@@ -90,12 +83,32 @@ export const columns: ColumnDef<IWidthrawalRequestsData>[] = [
     },
   },
   {
-    accessorKey: "amount",
+    accessorKey: "total_amount",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount" />
+      <DataTableColumnHeader column={column} title="Total Amount" />
     ),
     cell: ({ row }) => {
-      const amount = row.getValue("amount") as number;
+      const amount = row.getValue("total_amount") as number;
+      return <div className="font-medium">{amount}</div>;
+    },
+  },
+  {
+    accessorKey: "total_payable",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Amount Payable" />
+    ),
+    cell: ({ row }) => {
+      const amount = row.getValue("total_payable") as number;
+      return <div className="font-medium">{amount}</div>;
+    },
+  },
+  {
+    accessorKey: "transaction_cost",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Transaction Cost" />
+    ),
+    cell: ({ row }) => {
+      const amount = row.getValue("transaction_cost") as number;
       return <div className="font-medium">{amount}</div>;
     },
   },

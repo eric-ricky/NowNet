@@ -17,7 +17,7 @@ const AdminWidthrawalRequestCard = () => {
   const widthrawalRequests = useQuery(
     api.widthrawaltransactions.getAllWidthrawalTransactionRequests,
     {
-      userId: activeUser?._id,
+      adminEmail: activeUser?.email,
     }
   );
 

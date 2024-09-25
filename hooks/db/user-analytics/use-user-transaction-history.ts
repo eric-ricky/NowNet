@@ -2,7 +2,7 @@ import { api } from "@/convex/_generated/api";
 import { ITransactionHistory } from "@/lib/types";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import useActiveUser from "./use-active-user";
+import useActiveUser from "../use-active-user";
 
 const useUserTransactionHistory = () => {
   const { activeUser } = useActiveUser();
@@ -28,7 +28,7 @@ const useUserTransactionHistory = () => {
     for (const transaction of usersTopupTransactions) {
       const payload: ITransactionHistory = {
         _creationTime: transaction._creationTime,
-        amount: transaction.amount,
+        amount: +transaction.amount,
         currency: transaction.currency,
         description: transaction.description,
         payment_account: transaction.payment_account,
@@ -44,7 +44,7 @@ const useUserTransactionHistory = () => {
     for (const transaction of usersWidthrawalTransactions) {
       const payload: ITransactionHistory = {
         _creationTime: transaction._creationTime,
-        amount: transaction.amount,
+        amount: transaction.total_payable,
         currency: transaction.currency,
         description: transaction.description,
         payment_account: transaction.payment_account,

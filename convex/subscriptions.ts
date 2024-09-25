@@ -260,6 +260,8 @@ export const updateConsumedAmount = internalMutation({
       const newAmountConsumed = sub.wifi?.rate
         ? timeTakenInHours * (+sub.wifi.rate / 720)
         : 0;
+      const newCommission = 0.1 * newAmountConsumed;
+      const newOwnerEarnings = newAmountConsumed - newCommission;
 
       // update amount consumed
       await db.patch(sub._id, {
@@ -286,8 +288,44 @@ export const updateConsumedAmount = internalMutation({
       if (!upcomingEarning) continue;
 
       await db.patch(upcomingEarning._id, {
-        amountEarned: upcomingEarning.amountEarned + newAmountConsumed,
+        totalEarnings: upcomingEarning.totalEarnings + newAmountConsumed,
+        commission: upcomingEarning.commission + newCommission,
+        ownerEarnings: upcomingEarning.ownerEarnings + newOwnerEarnings,
       });
     }
+  },
+});
+
+// for admin
+export const getAllActiveSubscriptionsAdmin = query({
+  args: {
+    adminEmail: v.optional(v.string()),
+  },
+  handler: async ({ db, auth }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
+
+    const { adminEmail } = args;
+    const admin = await db
+      .query("admins")
+      .filter((q) => q.eq(q.field("email"), adminEmail))
+      .first();
+    if (!admin) return undefined;
+
+    const subscriptions = await db
+      .query("subscriptions")
+      .filter((q) => q.eq(q.field("isActive"), true))
+      .collect();
+
+    const output = await Promise.all(
+      subscriptions.map(async (sub) => {
+        const user = await db.get(sub.user);
+        const wifi = await db.get(sub.wifi);
+
+        return { ...sub, wifi, user };
+      })
+    );
+
+    return output;
   },
 });

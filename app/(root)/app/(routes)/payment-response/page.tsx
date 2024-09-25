@@ -61,7 +61,7 @@ const PaymentResponsePage = () => {
   }, [orderTrackingId, orderMerchantReference]);
 
   return (
-    <div className={cn("flex flex-col", containerDivStyles)}>
+    <div className={cn(containerDivStyles)}>
       <div className="border-b border-t">
         <div className="flex h-16 items-center px-4 md:px-8">
           <Link href="/app" className="w-fit">

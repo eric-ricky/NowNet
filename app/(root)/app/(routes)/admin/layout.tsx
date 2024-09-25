@@ -1,6 +1,7 @@
 "use client";
 
 import { useAdminAuthModal } from "@/hooks/modal-state/use-admin-auth-modal";
+import { containerDivStyles } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { PropsWithChildren, useEffect } from "react";
 
@@ -13,7 +14,12 @@ const AdminLayout = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {}, []);
   return (
-    <div className={cn("", !isAuthenticated ? "blur-none" : "blur-sm")}>
+    <div
+      className={cn(
+        containerDivStyles,
+        !isAuthenticated ? "blur-none" : "blur-sm"
+      )}
+    >
       {children}
     </div>
   );

@@ -58,4 +58,4 @@ export const adminSidebarLinks = [
   },
 ];
 
-export const containerDivStyles = `max-xl:max-h-screen max-xl::overflow-y-auto !overflow-x-hidden no-scrollbar`;
+export const containerDivStyles = `h-full overflow-y-scroll overflow-x-hidden no-scrollbar`;

@@ -49,7 +49,7 @@ const MainLayout = async ({ children }: PropsWithChildren) => {
             <UserButton />
 
             <div className="flex md:hidden">
-              <MobileNav />
+              <MobileNav user={userData} />
             </div>
           </div>
         </div>

@@ -10,12 +10,7 @@ interface IProps {
 const AdminEarningsTable = ({ earnings, loading }: IProps) => {
   return (
     <div>
-      <DataTable
-        searchColumn="amountEarned"
-        columns={columns}
-        data={earnings}
-        loading={loading}
-      />
+      <DataTable columns={columns} data={earnings} loading={loading} />
     </div>
   );
 };

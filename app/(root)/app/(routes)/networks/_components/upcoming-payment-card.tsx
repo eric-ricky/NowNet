@@ -9,8 +9,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
+import useUpcomingEarnings from "@/hooks/db/owner-analytics/use-upcoming-earnings";
 import useActiveUser from "@/hooks/db/use-active-user";
-import useUpcomingEarnings from "@/hooks/db/use-upcoming-earnings";
 import { formatToKES } from "@/lib/utils";
 import { useQuery } from "convex/react";
 import { CreditCard } from "lucide-react";
@@ -18,7 +18,7 @@ import Link from "next/link";
 
 const UpcomingPaymentCard = () => {
   const { activeUser } = useActiveUser();
-  const { upcomingEarning } = useUpcomingEarnings();
+  const { totalUpcomingEarning } = useUpcomingEarnings();
   const admins = useQuery(api.admins.getAdmins);
 
   return (
@@ -31,7 +31,7 @@ const UpcomingPaymentCard = () => {
       </CardHeader>
 
       <CardContent className="flex flex-col">
-        <CardTitle>{formatToKES(upcomingEarning)}</CardTitle>
+        <CardTitle>{formatToKES(totalUpcomingEarning)}</CardTitle>
 
         {admins &&
           admins.some((admin) => admin.email !== activeUser?.email) && (

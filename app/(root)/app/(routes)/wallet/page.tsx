@@ -11,23 +11,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { api } from "@/convex/_generated/api";
-import useActiveUser from "@/hooks/db/use-active-user";
+import useUserTotalSpent from "@/hooks/db/user-analytics/use-user-total-spent";
 import { containerDivStyles } from "@/lib/data";
 import { cn, formatToKES } from "@/lib/utils";
-import { useQuery } from "convex/react";
 import { ArrowUp, CreditCard, Wallet } from "lucide-react";
 
 const WalletPage = () => {
-  const { activeUser } = useActiveUser();
-  const totalAmountSpent = useQuery(api.subscriptions.getTotalSpentByUser, {
-    user: activeUser?._id,
-  });
+  const { totalAmountSpent, userBalance } = useUserTotalSpent();
 
   return (
-    <div
-      className={cn("flex flex-col h-full overflow-y-auto", containerDivStyles)}
-    >
+    <div className={cn(containerDivStyles)}>
       <div className="border-b border-t">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">
@@ -43,7 +36,7 @@ const WalletPage = () => {
         <div className="flex flex-col md:flex-row md:items-center  w-full gap-4">
           <Card className="sm:h-[240px] h-fit md:w-[500px] w-full bg-slate-100">
             <CardHeader className="text-center w-full">
-              <CardTitle>{formatToKES(activeUser?.balance)}</CardTitle>
+              <CardTitle>{formatToKES(userBalance)}</CardTitle>
               <CardDescription>Your current balance</CardDescription>
             </CardHeader>
 

@@ -83,7 +83,7 @@ export const getOwnersWifis = query({
   },
 });
 
-export const getAdminWifis = query({
+export const getAllWifisAdmin = query({
   args: {
     adminEmail: v.optional(v.string()),
   },
@@ -117,6 +117,9 @@ export const deleteWifi = mutation({
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
+    const wifi = await db.get(args.id);
+    if (!wifi) throw new ConvexError(`Wifi does not exist`);
+
     // check subscriptions
     const subscription = await db
       .query("subscriptions")
@@ -125,6 +128,19 @@ export const deleteWifi = mutation({
     if (subscription)
       throw new ConvexError("Cannot delete network with subscriptions");
 
+    // archive earnings
+    const upcomingEarning = await db
+      .query("earnings")
+      .withIndex("by_owner_wifi", (q) =>
+        q.eq("owner", wifi.owner).eq("wifi", wifi._id)
+      )
+      .filter((q) => q.eq(q.field("isUpcoming"), true))
+      .first();
+    if (upcomingEarning) {
+      await db.patch(upcomingEarning._id, {
+        isUpcoming: false,
+      });
+    }
     await db.delete(args.id);
   },
 });

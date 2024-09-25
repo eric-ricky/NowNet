@@ -95,11 +95,14 @@ const NetworkModal = () => {
         const now = new Date();
         const weekEnding = `${getNextPaymentDate(now)}`; // the next  monday from now
         await createEarning({
-          amountEarned: 0,
-          isUpcoming: true,
-          owner,
-          weekEnding,
           wifi: newWifiId,
+          owner,
+          totalEarnings: 0,
+          commission: 0,
+          ownerEarnings: 0,
+          isArchived: false,
+          isUpcoming: true,
+          weekEnding,
         });
       }
 

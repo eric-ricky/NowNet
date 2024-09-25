@@ -76,7 +76,9 @@ export default defineSchema(
     }).index("by_user", ["user"]),
     widthrawaltransactions: defineTable({
       user: v.id("users"),
-      amount: v.string(),
+      total_amount: v.number(),
+      transaction_cost: v.number(),
+      total_payable: v.number(),
       currency: v.string(),
       description: v.string(),
       payment_account: v.string(), // mpesa phone number to be paid to
@@ -92,9 +94,12 @@ export default defineSchema(
     earnings: defineTable({
       owner: v.id("users"),
       wifi: v.id("wifis"),
-      amountEarned: v.number(),
+      totalEarnings: v.number(),
+      commission: v.number(),
+      ownerEarnings: v.number(),
       weekEnding: v.string(),
       isUpcoming: v.boolean(),
+      isArchived: v.boolean(),
     }).index("by_owner_wifi", ["owner", "wifi"]),
     admins: defineTable({
       email: v.string(),

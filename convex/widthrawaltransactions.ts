@@ -4,7 +4,9 @@ import { mutation, query } from "./_generated/server";
 export const createWidthrawalTransaction = mutation({
   args: {
     user: v.id("users"),
-    amount: v.string(),
+    total_amount: v.number(),
+    transaction_cost: v.number(),
+    total_payable: v.number(),
     currency: v.string(),
     description: v.string(),
     payment_account: v.string(), // mpesa phone number to be paid to
@@ -22,7 +24,9 @@ export const createWidthrawalTransaction = mutation({
     if (!identity) throw new ConvexError("Unauthenticated");
 
     const {
-      amount,
+      total_amount,
+      total_payable,
+      transaction_cost,
       currency,
       description,
       payment_account,
@@ -33,20 +37,22 @@ export const createWidthrawalTransaction = mutation({
 
     // check if user has juice
     const userData = await db.get(user);
-    const hasJuice = userData && userData.balance > +amount;
+    const hasJuice = userData && userData.balance > +total_amount;
     if (!userData || !hasJuice)
       throw new ConvexError(
-        `You have insufficient balance to widthraw KSH${amount}`
+        `You have insufficient balance to widthraw KSH${total_amount}`
       );
 
     // credit the user's balance
-    const balance = userData.balance - +amount;
+    const balance = userData.balance - +total_amount;
     await db.patch(user, {
       balance,
     });
 
     const newTransactionId = await db.insert("widthrawaltransactions", {
-      amount,
+      total_amount,
+      total_payable,
+      transaction_cost,
       currency,
       description,
       payment_account,
@@ -71,6 +77,9 @@ export const updateWidthrawalTransaction = mutation({
     ),
   },
   handler: async ({ db, auth }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
+
     const { id, payment_status_description } = args;
 
     const existingTransaction = await db.get(id);
@@ -102,19 +111,16 @@ export const getUserWidthrawalTransactionHistory = query({
 
 export const getAllWidthrawalTransactionRequests = query({
   args: {
-    userId: v.optional(v.id("users")),
+    adminEmail: v.optional(v.string()),
   },
-  handler: async ({ db }, args) => {
-    const { userId } = args;
-    if (!userId) return undefined;
+  handler: async ({ db, auth }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
 
-    // check if user is admin
-    const user = await db.get(userId);
     const admin = await db
       .query("admins")
-      .filter((q) => q.eq(q.field("email"), user?.email))
+      .filter((q) => q.eq(q.field("email"), args.adminEmail))
       .first();
-
     if (!admin) return undefined;
 
     const transactions = await db

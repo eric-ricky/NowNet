@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
+import useActiveUser from "@/hooks/db/use-active-user";
 import { IEarningsData } from "@/lib/types";
 import { getNextPaymentDate } from "@/lib/utils";
 import { Row } from "@tanstack/react-table";
@@ -25,6 +26,8 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
+  const { activeUser } = useActiveUser();
+
   const earning = row.original as IEarningsData;
   const [openAlertModal, setOpenAlertModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,7 @@ export function DataTableRowActions<TData>({
   const payEarning = useMutation(api.earnings.payEarning);
 
   const onSendMoney = async () => {
-    if (!earning.owner) return;
+    if (!earning.owner || !activeUser) return;
 
     const toastId = toast.loading(`Sending money to ${earning.owner.name}`, {
       id: "loadingSendingMoney",
@@ -47,6 +50,7 @@ export function DataTableRowActions<TData>({
       await payEarning({
         earningId: earning._id,
         nextWeekEnding,
+        adminEmail: activeUser.email,
       });
       toast.success("Payment made successfully!", {
         id: toastId,
@@ -54,6 +58,7 @@ export function DataTableRowActions<TData>({
           color: "black",
         },
       });
+      setOpenAlertModal(false);
     } catch (error: any) {
       console.log("ERROR HERE", error.data);
       const errorMsg =
@@ -91,7 +96,7 @@ export function DataTableRowActions<TData>({
 
         <DropdownMenuContent align="end" className="w-[180px]">
           <DropdownMenuItem
-            disabled={!earning.isUpcoming}
+            disabled={!earning.isUpcoming || !activeUser}
             onClick={() => setOpenAlertModal(true)}
             className="flex items-center space-x-1 text-sm"
           >

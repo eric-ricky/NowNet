@@ -1,6 +1,6 @@
 "use client";
 
-import useUserTransactionHistory from "@/hooks/db/use-user-transaction-history";
+import useUserTransactionHistory from "@/hooks/db/user-analytics/use-user-transaction-history";
 import { cn, formatToKES } from "@/lib/utils";
 import { Dot, Store } from "lucide-react";
 import moment from "moment";

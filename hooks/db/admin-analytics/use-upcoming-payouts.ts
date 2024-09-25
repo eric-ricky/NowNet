@@ -2,9 +2,9 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import useActiveUser from "./use-active-user";
+import useActiveUser from "../use-active-user";
 
-const useUpcomingEarnings = () => {
+const useUpcomingPayouts = () => {
   const { activeUser } = useActiveUser();
   const ownerUpcomingEarnings = useQuery(
     api.earnings.getOwnersUpcomingEarnings,
@@ -12,19 +12,19 @@ const useUpcomingEarnings = () => {
       owner: activeUser?._id as Id<"users">,
     }
   );
-  const [upcomingEarning, setUpcomingEarning] = useState(0);
+  const [upcomingPayouts, setUpcomingPayouts] = useState(0);
 
   useEffect(() => {
     if (!ownerUpcomingEarnings) return;
 
     const totalUpcomingEarnings = ownerUpcomingEarnings.reduce(
-      (total, curr) => total + curr.amountEarned,
+      (total, curr) => total + curr.ownerEarnings,
       0
     );
-    setUpcomingEarning(totalUpcomingEarnings);
+    setUpcomingPayouts(totalUpcomingEarnings);
   }, [ownerUpcomingEarnings]);
 
-  return { upcomingEarning };
+  return { upcomingPayouts };
 };
 
-export default useUpcomingEarnings;
+export default useUpcomingPayouts;

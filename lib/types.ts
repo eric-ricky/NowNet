@@ -45,9 +45,12 @@ export interface IEarningsData {
   wifi: Doc<"wifis"> | null;
   _id: Id<"earnings">;
   _creationTime: number;
-  amountEarned: number;
-  isUpcoming: boolean;
+  commission: number;
+  ownerEarnings: number;
+  totalEarnings: number;
   weekEnding: string;
+  isArchived: boolean;
+  isUpcoming: boolean;
 }
 
 export interface INetworksData {
@@ -71,18 +74,22 @@ export interface IWidthrawalRequestsData {
   user: Doc<"users"> | null;
   _id: Id<"widthrawaltransactions">;
   _creationTime: number;
-  amount: string;
   currency: string;
   description: string;
   payment_account: string;
   payment_method: string;
   payment_status_description: Infer<typeof payment_status_description>;
+  total_amount: number;
+  total_payable: number;
+  transaction_cost: number;
 }
+
+// const d:Doc<'widthrawaltransactions'>
 
 export interface ITransactionHistory {
   _id: string;
   _creationTime: number;
-  amount: string;
+  amount: number;
   currency: string;
   description: string;
   payment_account: string;

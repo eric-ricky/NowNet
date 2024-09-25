@@ -12,7 +12,6 @@ import {
 import { api } from "@/convex/_generated/api";
 import { ISubscriptionsData } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
-import axios from "axios";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Copy, Link2, MoreHorizontal } from "lucide-react";
@@ -71,16 +70,16 @@ export function DataTableRowActions<TData>({
       // });
 
       // Email Notifications to user
-      await axios.post(`/api/knock/device-connected-notification`, {
-        recipient_userId: subscription.user?._id,
-        recipient_email: subscription.user?.email,
-        recipient_username: subscription.user?.name,
+      // await axios.post(`/api/knock/device-connected-notification`, {
+      //   recipient_userId: subscription.user?._id,
+      //   recipient_email: subscription.user?.email,
+      //   recipient_username: subscription.user?.name,
 
-        devicename: subscription.device?.name,
-        macaddress: subscription.device?.macAddress,
-        wifiname: subscription.wifi?.name,
-        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions`,
-      });
+      //   devicename: subscription.device?.name,
+      //   macaddress: subscription.device?.macAddress,
+      //   wifiname: subscription.wifi?.name,
+      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions`,
+      // });
 
       // success
       toast.success(`Connected successfully`, {

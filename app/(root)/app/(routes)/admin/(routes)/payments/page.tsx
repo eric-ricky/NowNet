@@ -9,27 +9,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import useTotalPaidOut from "@/hooks/db/use-total-paid-out";
-import useUpcomingEarnings from "@/hooks/db/use-upcoming-earnings";
+import useTotalPaidOut from "@/hooks/db/admin-analytics/use-total-paid-out";
+import useUpcomingPayouts from "@/hooks/db/admin-analytics/use-upcoming-payouts";
+import useWidthrawalRequestsStats from "@/hooks/db/admin-analytics/use-widthrawal-requests-stats";
+import { containerDivStyles } from "@/lib/data";
 import { cn, formatToKES, getNextPaymentDate } from "@/lib/utils";
 import {
   ArrowUp,
   Banknote,
   CreditCard,
   Loader2,
-  Search,
   SquareChartGantt,
 } from "lucide-react";
 
 const PaymentsPage = () => {
-  const { upcomingEarning } = useUpcomingEarnings();
-  const { totalEarning } = useTotalPaidOut();
+  const { upcomingPayouts } = useUpcomingPayouts();
+  const { totalPaidOut } = useTotalPaidOut();
+  const { totalWidthrawn, totalUpcomingWidthrawal, totalWidthrawalTC } =
+    useWidthrawalRequestsStats();
 
   return (
-    <div className="flex flex-col">
+    <div className={cn(containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">
@@ -42,16 +44,17 @@ const PaymentsPage = () => {
       </div>
 
       <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:p-8 pt-6 overflow-x-hidden">
-        <Card className={cn("min-w-]")}>
+        {/* total paid out */}
+        <Card className="col-span-2 sm:col-span-1">
           <CardHeader className="w-full flex-row items-center justify-between">
-            <CardTitle className="text-sm">Total Paid Out</CardTitle>
+            <CardTitle className="text-sm">Total Payouts</CardTitle>
             <CardDescription>
               <CreditCard size={15} />
             </CardDescription>
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalEarning)}</CardTitle>
+            <CardTitle>{formatToKES(totalPaidOut)}</CardTitle>
 
             <div className="flex items-center">
               <p className="text-green flex items-center text-sm text-green-500">
@@ -65,16 +68,17 @@ const PaymentsPage = () => {
           </CardContent>
         </Card>
 
-        <Card className={cn("min-w-[0")}>
+        {/* upcoming payouts */}
+        <Card className="col-span-2 sm:col-span-1">
           <CardHeader className="w-full flex-row items-center justify-between">
-            <CardTitle className="text-sm">Upcoming</CardTitle>
+            <CardTitle className="text-sm">Upcoming Payouts</CardTitle>
             <CardDescription>
               <CreditCard size={15} />
             </CardDescription>
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(upcomingEarning)}</CardTitle>
+            <CardTitle>{formatToKES(upcomingPayouts)}</CardTitle>
 
             <div className="flex items-center gap-1">
               <p className="text-sm text-muted-foreground">upcoming on </p>
@@ -86,17 +90,77 @@ const PaymentsPage = () => {
           </CardContent>
         </Card>
 
+        {/* total widthrawn */}
+        <Card className="col-span-2 sm:col-span-1">
+          <CardHeader className="w-full flex-row items-center justify-between">
+            <CardTitle className="text-sm">Total Widthrawn</CardTitle>
+            <CardDescription>
+              <CreditCard size={15} />
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="flex flex-col">
+            <CardTitle>{formatToKES(totalWidthrawn)}</CardTitle>
+
+            <div className="flex items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                total real amount sent to users{" "}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* pending widthrawal */}
+        <Card className="col-span-2 sm:col-span-1">
+          <CardHeader className="w-full flex-row items-center justify-between">
+            <CardTitle className="text-sm">Upcoming Widthrawal</CardTitle>
+            <CardDescription>
+              <CreditCard size={15} />
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="flex flex-col">
+            <CardTitle>{formatToKES(totalUpcomingWidthrawal)}</CardTitle>
+
+            <div className="flex items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                total amount to be sent to users
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* transaction cost */}
+        <Card className="col-span-2 sm:col-span-1">
+          <CardHeader className="w-full flex-row items-center justify-between">
+            <CardTitle className="text-sm">Widthrawal TC</CardTitle>
+            <CardDescription>
+              <CreditCard size={15} />
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="flex flex-col">
+            <CardTitle>{formatToKES(totalWidthrawalTC)}</CardTitle>
+
+            <div className="flex items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                Widthrawal transaction cost
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="col-span-2 grid gap-4 grid-cols-1">
           <Tabs defaultValue="upcoming">
-            <div className="flex items-center px-4 py-2">
+            <div className="flex items-center flex-col sm:flex-row px-4 py-2 h-28">
               <div className="flex items-center space-x-2 text-slate-500 text-sm font-medium">
                 <SquareChartGantt />
               </div>
 
-              <TabsList className="ml-auto">
+              <TabsList className="ml-auto flex-wrap">
                 <TabsTrigger
                   value="upcoming"
-                  className="text-zinc-600 dark:text-zinc-200"
+                  className="text-zinc-600 dark:text-zinc-200 p-2"
                 >
                   Upcoming Earnings
                 </TabsTrigger>
@@ -118,20 +182,6 @@ const PaymentsPage = () => {
             </div>
 
             <Separator />
-
-            <div className="bg-background/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-              <form>
-                <div className="relative">
-                  <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search"
-                    className="pl-8"
-                    // value={queryTemp || ""}
-                    // onChange={(e) => setQueryTemp(e.target.value)}
-                  />
-                </div>
-              </form>
-            </div>
 
             <TabsContent
               value="widthrawal"
@@ -156,23 +206,10 @@ const PaymentsPage = () => {
               <AdminWifisEarningsCard isUpcoming={false} />
             </TabsContent>
           </Tabs>
-
-          {/* <Card>
-            <CardHeader>
-              <CardTitle className="text-xl">Widthrawal Requests</CardTitle>
-              <CardDescription className="text-xs">
-                Manage all your active connections
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AdminWidthrawalRequestTable
-                widthrawalRequests={[]}
-                loading={false}
-              />
-            </CardContent>
-          </Card> */}
         </div>
       </div>
+
+      <div className="h-[20vh]"></div>
     </div>
   );
 };

@@ -23,7 +23,8 @@ const DevicesPage = () => {
   };
 
   return (
-    <div className={cn("flex flex-col", containerDivStyles)}>
+    // <div className={cn("flex flex-col", containerDivStyles)}>
+    <div className={cn(containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">
@@ -45,6 +46,8 @@ const DevicesPage = () => {
       <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 overflow-x-hidden">
         <DevicesTable devices={devices || []} loading={!devices} />
       </div>
+
+      <div className="h-[20vh]"></div>
     </div>
   );
 };

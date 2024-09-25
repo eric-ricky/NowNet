@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { useSubscriptionModal } from "@/hooks/modal-state/use-subscription-modal";
@@ -39,7 +38,8 @@ const SubscriptionsPage = () => {
   };
 
   return (
-    <div className={cn("flex flex-col ", containerDivStyles)}>
+    // <div className={cn("flex flex-col ", containerDivStyles)}>
+    <div className={cn(containerDivStyles)}>
       <div className="border-b">
         <div className="flex h-16 items-center px-4 md:px-8">
           <div className="border p-2 rounded-md text-muted-foreground">
@@ -62,7 +62,7 @@ const SubscriptionsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6 overflow-x-hidden">
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <Card>
           <CardHeader className="w-full flex-row items-center justify-between">
             <CardTitle className="text-lg">Active Subscriptions</CardTitle>
@@ -78,9 +78,9 @@ const SubscriptionsPage = () => {
             />
           </CardContent>
         </Card>
+      </div>
 
-        <Separator className="my-2" />
-
+      <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
         <Card className="opacity-55">
           <CardHeader className="w-full flex-row items-center justify-between">
             <CardTitle className="text-lg">Past Subscriptions</CardTitle>
@@ -106,6 +106,8 @@ const SubscriptionsPage = () => {
           </CardContent>
         </Card>
       </div>
+
+      <div className="h-[20vh]"></div>
     </div>
   );
 };

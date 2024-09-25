@@ -1,0 +1,1 @@
+export const WIDTHRAWAL_TRANSACTION_COST = 20;

@@ -8,9 +8,7 @@ import { formatToKES } from "@/lib/utils";
 import { ColumnDef } from "@tanstack/react-table";
 import moment from "moment";
 
-// const d:IEarningsData = {
-//   _creationTime,_id,amountEarned,isUpcoming,owner,weekEnding,wifi
-// }
+// _creationTime, _id,commission,isArchived,isUpcoming,owner,ownerEarnings,totalEarnings,weekEnding,wifi
 
 export const columns: ColumnDef<IEarningsData>[] = [
   {
@@ -87,12 +85,12 @@ export const columns: ColumnDef<IEarningsData>[] = [
     ),
   },
   {
-    accessorKey: "amountEarned",
+    accessorKey: "ownerEarnings",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Amount Earned" />
     ),
     cell: ({ row }) => {
-      const amount = row.getValue("amountEarned") as number;
+      const amount = row.getValue("ownerEarnings") as number;
       return <div className="font-medium">{formatToKES(amount)}</div>;
     },
   },

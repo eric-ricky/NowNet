@@ -2,7 +2,7 @@ import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
-import useActiveUser from "./use-active-user";
+import useActiveUser from "../use-active-user";
 
 const useTotalEarnings = () => {
   const { activeUser } = useActiveUser();
@@ -15,7 +15,7 @@ const useTotalEarnings = () => {
     if (!ownerPastEarnings) return;
 
     const totalPastEarnings = ownerPastEarnings.reduce(
-      (total, curr) => total + curr.amountEarned,
+      (total, curr) => total + curr.ownerEarnings,
       0
     );
     setTotalEarning(totalPastEarnings);

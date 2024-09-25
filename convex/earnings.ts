@@ -1,5 +1,5 @@
 import { ConvexError, v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { mutation, query } from "./_generated/server";
 
 // N/B: Every wifi has one isUpcoming earning
 
@@ -7,27 +7,43 @@ export const createEarning = mutation({
   args: {
     owner: v.id("users"),
     wifi: v.id("wifis"),
-    amountEarned: v.number(),
+    totalEarnings: v.number(),
+    commission: v.number(),
+    ownerEarnings: v.number(),
     weekEnding: v.string(),
     isUpcoming: v.boolean(),
+    isArchived: v.boolean(),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
-    const { amountEarned, isUpcoming, owner, weekEnding, wifi } = args;
-    const existingEarning = await db
+    const {
+      wifi,
+      owner,
+      totalEarnings,
+      commission,
+      ownerEarnings,
+      isArchived,
+      isUpcoming,
+      weekEnding,
+    } = args;
+    const existingUpcomingEarning = await db
       .query("earnings")
-      .filter((q) => q.eq(q.field("weekEnding"), weekEnding))
+      .withIndex("by_owner_wifi", (q) => q.eq("owner", owner).eq("wifi", wifi))
+      .filter((q) => q.eq(q.field("isUpcoming"), true))
       .first();
-    if (existingEarning) return;
+    if (existingUpcomingEarning) return;
 
     const newEarningId = await db.insert("earnings", {
-      amountEarned,
-      isUpcoming,
-      owner,
-      weekEnding,
       wifi,
+      owner,
+      totalEarnings,
+      commission,
+      ownerEarnings,
+      isArchived,
+      isUpcoming,
+      weekEnding,
     });
 
     return newEarningId;
@@ -97,6 +113,7 @@ export const getAllOwnersEarnings = query({
     const earnings = await db
       .query("earnings")
       .withIndex("by_owner_wifi", (q) => q.eq("owner", owner))
+      .order("desc")
       .collect();
 
     const output = await Promise.all(
@@ -142,15 +159,28 @@ export const getAllEarningsAdmin = query({
   },
 });
 
-// pay the user (update isUpcoming:false; create a new earning; and deposit to user balance)
+/** Pay the user
+ * (update isUpcoming:false;
+ * create a new earning;
+ * and deposit to user balance)
+ */
 export const payEarning = mutation({
   args: {
+    adminEmail: v.optional(v.string()),
     earningId: v.id("earnings"),
     nextWeekEnding: v.string(),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
+
+    // check if is admin
+    const isAdmin = await db
+      .query("admins")
+      .filter((q) => q.eq(q.field("email"), args.adminEmail))
+      .first();
+    if (!isAdmin)
+      throw new ConvexError("You are not authorized to perform the action");
 
     // get earning
     const earning = await db.get(args.earningId);
@@ -165,121 +195,17 @@ export const payEarning = mutation({
       isUpcoming: false,
     });
     await db.patch(owner._id, {
-      balance: owner.balance + earning.amountEarned,
+      balance: owner.balance + earning.ownerEarnings,
     });
     await db.insert("earnings", {
-      owner: owner._id,
       wifi: earning.wifi,
-      amountEarned: 0,
-      weekEnding: args.nextWeekEnding,
+      owner: earning.owner,
+      totalEarnings: 0,
+      commission: 0,
+      ownerEarnings: 0,
+      isArchived: false,
       isUpcoming: true,
+      weekEnding: args.nextWeekEnding,
     });
-  },
-});
-
-/**
- * Deposit to owner's balance,
- * set isUpcoming:false,
- * create new upcoming earning for the wifiNetwork
- * */
-export const makePayment = mutation({
-  args: {
-    adminEmail: v.optional(v.string()),
-    weekEnding: v.string(),
-  },
-  handler: async ({ auth, db }, args) => {
-    const identity = await auth.getUserIdentity();
-    if (!identity) throw new ConvexError("Unauthenticated");
-
-    // check if is admin
-    const { adminEmail } = args;
-    if (!adminEmail) return null;
-    const isAdmin = await db
-      .query("admins")
-      .filter((q) => q.eq(q.field("email"), adminEmail))
-      .first();
-    if (!isAdmin)
-      throw new ConvexError(
-        "You dont have sufficent authority to perform the action."
-      );
-
-    // get all upcoming earnings
-    const earnings = await db
-      .query("earnings")
-      .filter((q) => q.eq(q.field("isUpcoming"), true))
-      .collect();
-
-    // process eact earning
-    for (const earning of earnings) {
-      // change isUpcoming:false
-      await db.patch(earning._id, {
-        isUpcoming: false,
-      });
-
-      // create a new earning for the wifi network
-      await db.insert("earnings", {
-        wifi: earning.wifi,
-        owner: earning.owner,
-        amountEarned: 0,
-        isUpcoming: true,
-        weekEnding: args.weekEnding,
-      });
-
-      // deposit amount to owner
-      const owner = await db.get(earning.owner);
-      if (owner) {
-        await db.patch(earning.owner, {
-          balance: owner.balance + earning.amountEarned,
-        });
-      }
-    }
-  },
-});
-
-// get user earnings and deposit to their balance
-export const processEarnings = internalMutation({
-  handler: async ({ db }) => {
-    // helper function (the next  monday from now)
-    const getNextPaymentDate = (date: Date): Date => {
-      const result = new Date(date);
-      // calculate how many days to add to get to the next monday
-      const dayOfWeek = result.getDay();
-      const daysUntilMonday = (8 - dayOfWeek) % 7 || 7;
-      // set the date to the next monday 00:00:00
-      result.setDate(result.getDate() + daysUntilMonday);
-      result.setHours(0, 0, 0, 0);
-      return result;
-    };
-
-    // get all upcoming earnings
-    const earnings = await db
-      .query("earnings")
-      .filter((q) => q.eq(q.field("isUpcoming"), true))
-      .collect();
-
-    for (const earning of earnings) {
-      // change upcoming to false
-      await db.patch(earning._id, {
-        isUpcoming: false,
-      });
-
-      // then create a new earning (where isUpcoming: true)
-      const now = new Date();
-      const weekEnding = `${getNextPaymentDate(now)}`;
-      await db.insert("earnings", {
-        amountEarned: 0,
-        isUpcoming: true,
-        weekEnding,
-        owner: earning.owner,
-        wifi: earning.wifi,
-      });
-
-      // deposit to user's (owner) balance
-      const user = await db.get(earning.owner);
-      if (!user) continue;
-      await db.patch(user._id, {
-        balance: user.balance + earning.amountEarned,
-      });
-    }
   },
 });

@@ -3,6 +3,7 @@
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { useWidthrawalModal } from "@/hooks/modal-state/use-widthrawal-modal";
+import { WIDTHRAWAL_TRANSACTION_COST } from "@/lib/constants";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -59,8 +60,13 @@ const WidthrawalModal = () => {
 
     try {
       const { amount, phone } = formData;
+      const transaction_cost = WIDTHRAWAL_TRANSACTION_COST;
+      const total_amount = +amount + transaction_cost;
+      const total_payable = +amount;
       await createWidthrawalRequest({
-        amount,
+        total_amount,
+        total_payable,
+        transaction_cost,
         currency: "KES",
         description: "",
         payment_account: phone,
@@ -102,7 +108,9 @@ const WidthrawalModal = () => {
         <DialogHeader className="px-4 py-4 border-b">
           <DialogTitle> Widthraw from your account</DialogTitle>
           <DialogDescription className="text-muted-foreground text-sm">
-            Please note that the minimum amount per transaction is 500 KES
+            Please note that the minimum amount per transaction is 500 KES.{" "}
+            <br />
+            Transaction cost KES {WIDTHRAWAL_TRANSACTION_COST}
           </DialogDescription>
         </DialogHeader>
 
@@ -125,7 +133,7 @@ const WidthrawalModal = () => {
                             type="number"
                             min={500}
                             max={10000}
-                            placeholder="Device name"
+                            placeholder="Amount"
                             {...field}
                           />
                         </FormControl>

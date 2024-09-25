@@ -10,7 +10,7 @@ import moment from "moment";
 import { DataTableRowActions } from "./row-actions";
 
 // const d:IEarningsData = {
-//   _creationTime,_id,amountEarned,isUpcoming,owner,weekEnding,wifi
+// _creationTime, _id,commission,isArchived,isUpcoming,owner,ownerEarnings,totalEarnings,weekEnding,wifi
 // }
 
 export const columns: ColumnDef<IEarningsData>[] = [
@@ -88,12 +88,32 @@ export const columns: ColumnDef<IEarningsData>[] = [
     ),
   },
   {
-    accessorKey: "amountEarned",
+    accessorKey: "totalEarnings",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Amount Earned" />
+      <DataTableColumnHeader column={column} title="Total Earnings" />
     ),
     cell: ({ row }) => {
-      const amount = row.getValue("amountEarned") as number;
+      const amount = row.getValue("totalEarnings") as number;
+      return <div className="font-medium">{formatToKES(amount)}</div>;
+    },
+  },
+  {
+    accessorKey: "ownerEarnings",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Owner Earning" />
+    ),
+    cell: ({ row }) => {
+      const amount = row.getValue("ownerEarnings") as number;
+      return <div className="font-medium">{formatToKES(amount)}</div>;
+    },
+  },
+  {
+    accessorKey: "commission",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Commission" />
+    ),
+    cell: ({ row }) => {
+      const amount = row.getValue("commission") as number;
       return <div className="font-medium">{formatToKES(amount)}</div>;
     },
   },
@@ -108,6 +128,22 @@ export const columns: ColumnDef<IEarningsData>[] = [
         <div className="flex space-x-2">
           <Badge variant={isUpcoming ? "default" : "secondary"}>
             {isUpcoming ? "Upcoming" : "Past"}
+          </Badge>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "isArchived",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Is Archived" />
+    ),
+    cell: ({ row }) => {
+      const isArchived = row.getValue("isArchived") as boolean;
+      return (
+        <div className="flex space-x-2">
+          <Badge variant={isArchived ? "default" : "connected"}>
+            {isArchived ? "Archived" : "Active"}
           </Badge>
         </div>
       );
