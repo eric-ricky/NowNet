@@ -1,6 +1,7 @@
 import Logo from "@/components/brand/logo";
 import NewUserComponent from "@/components/global/new-user";
 import NotificationFeed from "@/components/global/notification-feed";
+import PushNotificationProvider from "@/components/providers/push-notification-provider";
 import { api } from "@/convex/_generated/api";
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
@@ -8,6 +9,7 @@ import { ConvexHttpClient } from "convex/browser";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
 import MobileNav from "./_components/mobile-nav";
+import SettingsButton from "./_components/settings-button";
 import Sidebar from "./_components/sidebar";
 
 const client = new ConvexHttpClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
@@ -34,29 +36,33 @@ const MainLayout = async ({ children }: PropsWithChildren) => {
     );
 
   return (
-    <div className="flex h-screen w-full font-inter !overflow-hidden">
-      <Sidebar user={userData} />
+    <>
+      <PushNotificationProvider>
+        <div className="flex h-screen w-full font-inter !overflow-hidden">
+          <Sidebar user={userData} />
 
-      <div className="flex flex-col size-full overflow-hidden max-h-screen">
-        <div className="border-b border-t px-5 py-5 h-16 flex items-center">
-          <div className="flex md:hidden">
-            <Logo />
-          </div>
+          <div className="flex flex-col size-full overflow-hidden max-h-screen">
+            <div className="border-b border-t px-5 py-5 h-16 flex items-center">
+              <div className="flex md:hidden">
+                <Logo />
+              </div>
 
-          <div className="ml-auto flex items-center space-x-4">
-            <NotificationFeed />
+              <div className="ml-auto flex items-center space-x-4">
+                <NotificationFeed />
 
-            <UserButton />
+                <UserButton />
 
-            <div className="flex md:hidden">
-              <MobileNav user={userData} />
+                <SettingsButton />
+
+                <MobileNav user={userData} />
+              </div>
             </div>
+
+            {children}
           </div>
         </div>
-
-        {children}
-      </div>
-    </div>
+      </PushNotificationProvider>
+    </>
   );
 };
 

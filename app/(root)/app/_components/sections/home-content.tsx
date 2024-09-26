@@ -35,7 +35,7 @@ const HomeContent = () => {
             &nbsp;{activeUser?.name || "--"}
           </span>
         </h1>
-        <p className="text-[14px] text-gray-600">{activeUser?.email}</p>
+        <div className="text-[14px] text-gray-600">{activeUser?.email}</div>
       </div>
 
       <Separator />

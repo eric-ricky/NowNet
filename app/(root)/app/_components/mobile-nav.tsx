@@ -13,6 +13,7 @@ import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { adminSidebarLinks, sidebarLinks } from "@/lib/data";
 import { cn } from "@/lib/utils";
+import { SignOutButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { LogIn, LogOut, Menu } from "lucide-react";
 import Link from "next/link";
@@ -23,7 +24,7 @@ const MobileNav = ({ user }: { user: Doc<"users"> }) => {
   const admins = useQuery(api.admins.getAdmins);
 
   return (
-    <section className="w-full max-w-[264px]">
+    <section className="flex md:hidden w-full max-w-[264px]">
       <Sheet>
         <SheetTrigger>
           <Menu />
@@ -81,21 +82,23 @@ const MobileNav = ({ user }: { user: Doc<"users"> }) => {
                 )}
 
                 <SheetClose asChild>
-                  <div
-                    role="button"
-                    className={cn(
-                      "flex items-center gap-3 p-4 rounded-lg max-w-60 w-full text-black-2 hover:bg-bank-gradient hover:text-white"
-                    )}
-                  >
-                    <LogOut />
-                    <span
-                      className={cn("text-16 font-semibold ", {
-                        // "text-white": isActive,
-                      })}
+                  <SignOutButton>
+                    <div
+                      role="button"
+                      className={cn(
+                        "flex items-center gap-3 p-4 rounded-lg max-w-60 w-full text-black-2 hover:bg-bank-gradient hover:text-white"
+                      )}
                     >
-                      Logout
-                    </span>
-                  </div>
+                      <LogOut />
+                      <span
+                        className={cn("text-16 font-semibold ", {
+                          // "text-white": isActive,
+                        })}
+                      >
+                        Logout
+                      </span>
+                    </div>
+                  </SignOutButton>
                 </SheetClose>
               </nav>
             </SheetClose>

@@ -9,12 +9,21 @@ export const createUser = mutation({
     avatarUrl: v.optional(v.string()),
     phone: v.optional(v.string()),
     balance: v.number(),
+    notificationSubscription: v.optional(v.string()),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
-    const { balance, email, name, uid, avatarUrl, phone } = args;
+    const {
+      balance,
+      email,
+      name,
+      uid,
+      avatarUrl,
+      phone,
+      notificationSubscription,
+    } = args;
     const existingUser = await db
       .query("users")
       .withIndex("by_email", (q) => q.eq("email", email))
@@ -28,6 +37,7 @@ export const createUser = mutation({
       uid,
       avatarUrl,
       phone,
+      notificationSubscription,
     });
 
     return newUserId;
@@ -94,18 +104,20 @@ export const updateUser = mutation({
     avatarUrl: v.optional(v.string()),
     phone: v.optional(v.string()),
     balance: v.optional(v.number()),
+    notificationSubscription: v.optional(v.string()),
   },
   handler: async ({ db }, args) => {
     // get all users
     const user = await db.get(args.id);
     if (!user) return;
 
-    const { balance, name, avatarUrl, phone } = args;
+    const { balance, name, avatarUrl, phone, notificationSubscription } = args;
     await db.patch(args.id, {
       balance: balance || user.balance,
       name: name || user.name,
       avatarUrl: avatarUrl || user.avatarUrl,
       phone: phone || user.phone,
+      notificationSubscription,
     });
   },
 });

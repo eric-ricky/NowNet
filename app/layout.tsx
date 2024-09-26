@@ -1,5 +1,6 @@
 import ConvexClientProvider from "@/components/providers/convex-provider";
 import ModalProvider from "@/components/providers/modal-provider";
+import ServiceWorkerProvider from "@/components/providers/service-worker-provider";
 import { Toaster } from "@/components/ui/sonner";
 import type { Metadata } from "next";
 import { IBM_Plex_Serif, Inter } from "next/font/google";
@@ -42,7 +43,8 @@ export default function RootLayout({
         />
 
         <ConvexClientProvider>
-          {/* <div>
+          <ServiceWorkerProvider>
+            {/* <div>
             <section className="bg-gray-900 text-white">
               <div className="mx-auto max-w-screen-xl px-4 py-32 lg:flex lg:h-screen lg:items-center">
                 <div className="mx-auto max-w-3xl text-center">
@@ -68,10 +70,11 @@ export default function RootLayout({
             <div className="hidden">{children}</div>
           </div> */}
 
-          {children}
+            {children}
 
-          <Toaster />
-          <ModalProvider />
+            <Toaster />
+            <ModalProvider />
+          </ServiceWorkerProvider>
         </ConvexClientProvider>
       </body>
     </html>

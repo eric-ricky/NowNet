@@ -5,17 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-// export function getAmountConsumed(subscription: ISubscriptionsData) {
-//   const now = new Date();
-//   const startTime = new Date(subscription.startTime);
-//   const timeTakenInHours =
-//     (now.getTime() - startTime.getTime()) / (1000 * 60 * 60);
-//   const totalAmmountConsumed =
-//     timeTakenInHours * +(subscription.wifi?.rate || 0);
-
-//   return totalAmmountConsumed;
-// }
-
 export function formatToKES(amount?: number | null): string {
   if (amount === null || amount === undefined) return "--";
 
@@ -37,4 +26,31 @@ export function getNextPaymentDate(date: Date): Date {
   result.setHours(0, 0, 0, 0);
 
   return result;
+}
+
+// for push notifications
+export function urlBase64ToUint8Array(base64String: string) {
+  // const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  // const base64 = (base64String + padding)
+  //   .replace(/\\-/g, "+")
+  //   .replace(/_/g, "/");
+
+  // const rawData = window.atob(base64);
+  // const outputArray = new Uint8Array(rawData.length);
+
+  // for (let i = 0; i < rawData.length; ++i) {
+  //   outputArray[i] = rawData.charCodeAt(i);
+  // }
+  // return outputArray;
+
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, "+")
+    .replace(/_/g, "/");
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { sendNotification } from "@/actions/push-notifications";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -116,18 +117,18 @@ const SubscriptionModal = () => {
           style: { color: "red" },
         });
 
-      const now = `${new Date()}`;
-      await createSubscription({
-        user: activeUser._id,
-        wifi: selectedNetwork._id,
-        device: selectedDevice._id,
-        isActive: true,
-        startTime: now,
-        lastCredited: now,
-        endTime: undefined,
-        amountConsumed: 0,
-        status: "pending",
-      });
+      // const now = `${new Date()}`;
+      // await createSubscription({
+      //   user: activeUser._id,
+      //   wifi: selectedNetwork._id,
+      //   device: selectedDevice._id,
+      //   isActive: true,
+      //   startTime: now,
+      //   lastCredited: now,
+      //   endTime: undefined,
+      //   amountConsumed: 0,
+      //   status: "pending",
+      // });
 
       // Email Notifications to owner
       // await axios.post(`/api/knock/new-connection-notification`, {
@@ -140,6 +141,23 @@ const SubscriptionModal = () => {
       //   wifiname: selectedNetwork.name,
       //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
       // });
+
+      // send push notification to user
+
+      // send push notification to user
+      const owner = selectedNetwork.owner;
+
+      if (owner?.notificationSubscription) {
+        console.log(
+          "SENDING PUSH NOTIFICATION ====>",
+          owner.notificationSubscription
+        );
+        await sendNotification({
+          title: "New Connection request",
+          message: `${activeUser.name} is requesting to connect `,
+          user: JSON.stringify(owner),
+        });
+      }
 
       // success
       toast.success(`Subscription created successfully`, {
