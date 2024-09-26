@@ -117,36 +117,21 @@ const SubscriptionModal = () => {
           style: { color: "red" },
         });
 
-      // const now = `${new Date()}`;
-      // await createSubscription({
-      //   user: activeUser._id,
-      //   wifi: selectedNetwork._id,
-      //   device: selectedDevice._id,
-      //   isActive: true,
-      //   startTime: now,
-      //   lastCredited: now,
-      //   endTime: undefined,
-      //   amountConsumed: 0,
-      //   status: "pending",
-      // });
+      const now = `${new Date()}`;
+      await createSubscription({
+        user: activeUser._id,
+        wifi: selectedNetwork._id,
+        device: selectedDevice._id,
+        isActive: true,
+        startTime: now,
+        lastCredited: now,
+        endTime: undefined,
+        amountConsumed: 0,
+        status: "pending",
+      });
 
-      // Email Notifications to owner
-      // await axios.post(`/api/knock/new-connection-notification`, {
-      //   recipient_userId: selectedNetwork.owner?._id,
-      //   recipient_email: selectedNetwork.owner?.email,
-      //   recipient_username: selectedNetwork.owner?.name,
-
-      //   username: activeUser.name,
-      //   macaddress: selectedDevice.macAddress,
-      //   wifiname: selectedNetwork.name,
-      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
-      // });
-
-      // send push notification to user
-
-      // send push notification to user
+      // ==== 🔔 NOTIFY OWNER (Push Notification)
       const owner = selectedNetwork.owner;
-
       if (owner?.notificationSubscription) {
         console.log(
           "SENDING PUSH NOTIFICATION ====>",
@@ -154,10 +139,21 @@ const SubscriptionModal = () => {
         );
         await sendNotification({
           title: "New Connection request",
-          message: `${activeUser.name} is requesting to connect `,
+          message: `${activeUser.name} is requesting to connect to ${selectedNetwork.name}`,
           user: JSON.stringify(owner),
         });
       }
+
+      // Email Notifications to owner
+      // await axios.post(`/api/knock/new-connection-notification`, {
+      //   recipient_userId: selectedNetwork.owner?._id,
+      //   recipient_email: selectedNetwork.owner?.email,
+      //   recipient_username: selectedNetwork.owner?.name,
+      //   username: activeUser.name,
+      //   macaddress: selectedDevice.macAddress,
+      //   wifiname: selectedNetwork.name,
+      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
+      // });
 
       // success
       toast.success(`Subscription created successfully`, {

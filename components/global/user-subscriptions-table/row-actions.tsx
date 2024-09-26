@@ -1,5 +1,6 @@
 "use client";
 
+import { sendNotification } from "@/actions/push-notifications";
 import AlertModal from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,7 +14,6 @@ import {
 import { api } from "@/convex/_generated/api";
 import { ISubscriptionsData } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
-import axios from "axios";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Copy, Link2Off, MoreHorizontal, Trash } from "lucide-react";
@@ -28,9 +28,6 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const subscription = row.original as ISubscriptionsData;
-  const owner = useQuery(api.users.getUserById, {
-    userId: subscription.wifi?.owner,
-  });
   const updateSubscription = useMutation(api.subscriptions.updateSubscription);
   const createSubscription = useMutation(api.subscriptions.createSubscription);
 
@@ -68,32 +65,27 @@ export function DataTableRowActions<TData>({
         endTime: `${new Date()}`,
       });
 
-      // TODO:
-      // Email Notifications (to wifi owner and super admin)
-      // await axios.post(`/api/mail`, {
-      //   email: [owner?.email, "info.gasiapp@gmail.com"],
-      //   subject: `Disconnect ${subscription.user?.name}'s ${subscription.device?.name} from ${subscription.wifi?.name}`,
-      //   message: `
-      //   <p>Wifi: ${subscription.wifi?.name}</p>
-      //   <p>Device Name: ${subscription.device?.name}</p>
-      //   <p>Device Mac Address: ${subscription.device?.macAddress}</p>
-      //   <br />
-      //   <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}">Check Subscription</a>
-      //   `,
-      // });
+      // ==== 🔔 NOTIFY OWNER (Push Notification)
+      if (wifiOwner?.notificationSubscription) {
+        await sendNotification({
+          title: "Disconnection Request",
+          message: `${subscription.user?.name} has disconnected  ${subscription.device?.name}`,
+          user: JSON.stringify(wifiOwner),
+        });
+      }
 
       // Notification to network owner
-      await axios.post(`/api/knock/disconnection-request-notification`, {
-        recipient_userId: owner?._id,
-        recipient_email: owner?.email,
-        recipient_username: owner?.name,
+      // await axios.post(`/api/knock/disconnection-request-notification`, {
+      //   recipient_userId: wifiOwner?._id,
+      //   recipient_email: wifiOwner?.email,
+      //   recipient_username: wifiOwner?.name,
 
-        macaddress: subscription.device?.macAddress,
-        wifiname: subscription.wifi?.name,
-        username: subscription.user?.name,
-        devicename: subscription.device?.name,
-        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}`,
-      });
+      //   macaddress: subscription.device?.macAddress,
+      //   wifiname: subscription.wifi?.name,
+      //   username: subscription.user?.name,
+      //   devicename: subscription.device?.name,
+      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${subscription.wifi?._id}`,
+      // });
 
       // success
       toast.success(`Disconnected successfully`, {

@@ -1,5 +1,6 @@
 "use client";
 
+import { sendNotification } from "@/actions/push-notifications";
 import AlertModal from "@/components/modals/alert-modal";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,26 +56,20 @@ export function DataTableRowActions<TData>({
         startTime: `${new Date()}`,
       });
 
-      // TODO:
-      // Email Notifications (to user and super admin)
-      // await axios.post(`/api/mail`, {
-      //   email: [subscription.user?.email!, "info.gasiapp@gmail.com"],
-      //   subject: `Network ${subscription.wifi?.name} has been connected`,
-      //   message: `
-      //   <p>Wifi: ${subscription.wifi?.name}</p>
-      //   <p>Device Name: ${subscription.device?.name}</p>
-      //   <p>Device Mac Address: ${subscription.device?.macAddress}</p>
-      //   <br />
-      //   <a href="${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions">Check Subscriptions</a>
-      //   `,
-      // });
+      // ==== 🔔 NOTIFY USER (Push Notification)
+      if (subscription.user?.notificationSubscription) {
+        await sendNotification({
+          title: `${subscription.device?.name} Connected 🎉`,
+          message: `${subscription.device?.name} has been connected to ${subscription.wifi?.name}`,
+          user: JSON.stringify(subscription.user),
+        });
+      }
 
       // Email Notifications to user
       // await axios.post(`/api/knock/device-connected-notification`, {
       //   recipient_userId: subscription.user?._id,
       //   recipient_email: subscription.user?.email,
       //   recipient_username: subscription.user?.name,
-
       //   devicename: subscription.device?.name,
       //   macaddress: subscription.device?.macAddress,
       //   wifiname: subscription.wifi?.name,
