@@ -106,15 +106,11 @@ const PushNotificationModal = ({ user }: { user: Doc<"users"> }) => {
     <div className="fixed bottom-4 left-5 bg-white shadow-2xl border border-slate-400 rounded-xl p-4 flex flex-col gap-4 w-[320px] md:w-96">
       <BellRing size={32} className="text-blue-500 animate-bounce " />
 
-      <div className="font-medium">
-        Enable Notifications
-        {notificationPermission}
-      </div>
+      <div className="font-medium">Enable Notifications</div>
 
       <div className="text-muted-foreground text-sm">
         Get notified and never miss an important update on your platform
         activities.
-        {subscription?.endpoint}
       </div>
 
       <div className="flex items-center gap-2">

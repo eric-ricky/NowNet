@@ -101,7 +101,6 @@ const PushNotificationToggle = ({ user }: { user: Doc<"users"> }) => {
 
   return (
     <div className="cursor-pointer">
-      {notificationPermission}
       {isLoading ? (
         <Loader2 className="animate-spin" />
       ) : (
@@ -120,13 +119,6 @@ const PushNotificationToggle = ({ user }: { user: Doc<"users"> }) => {
               !!user.notificationSubscription
             }
           />
-
-          <div>
-            {notificationPermission === "granted" &&
-            !!user.notificationSubscription
-              ? "G"
-              : "D"}
-          </div>
         </div>
       )}
     </div>
