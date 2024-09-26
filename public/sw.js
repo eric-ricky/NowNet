@@ -4,7 +4,7 @@ self.addEventListener("push", async (e) => {
   e.waitUntil(
     self.registration.showNotification(message, {
       body,
-      icon,
+      icon: "/assets/icon128.jpeg",
     })
   );
 });

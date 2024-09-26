@@ -18,6 +18,19 @@ export const metadata: Metadata = {
   title: "NowNet – Seamless Wi-Fi Access, Pay As You Go",
   description:
     "NowNet allows you to connect to nearby Wi-Fi networks instantly and only pay for the time you use. Flexible, pay-per-use internet with no long-term contracts. Wi-Fi owners can earn weekly with NowNet.",
+  metadataBase: new URL("https://nownet.top/"),
+  authors: {
+    name: "ericricky",
+  },
+  openGraph: {
+    title: "NowNet",
+    description: "Connect to nearby Wi-Fi networks instantly",
+    url: "https://nownet.top/",
+    siteName: "NowNet",
+    images: "/assets/icon128.jpeg",
+    type: "website",
+  },
+  keywords: ["wifi networks", "eric ricky", "wifi", "now net"],
 };
 
 export default function RootLayout({

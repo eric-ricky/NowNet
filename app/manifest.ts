@@ -10,6 +10,18 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#000000",
+    screenshots: [
+      {
+        src: "/big.png",
+        sizes: "1208x761",
+        type: "image/png",
+      },
+      {
+        src: "/small.png",
+        sizes: "381x708",
+        type: "image/png",
+      },
+    ],
     icons: [
       {
         src: "/android-chrome-192x192.png",
