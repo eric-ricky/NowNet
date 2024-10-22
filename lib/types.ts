@@ -57,9 +57,9 @@ export interface INetworksData {
   owner: Doc<"users"> | null;
   _id: Id<"wifis">;
   _creationTime: number;
-  location?: string | undefined;
+  speed: string;
   name: string;
-  rate: string;
+  rate: number;
 }
 
 export const payment_status_description = v.union(

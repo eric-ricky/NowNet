@@ -11,8 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
+import useActiveUser from "@/hooks/db/use-active-user";
+import { NOTIFICATION_CHARGE } from "@/lib/constants";
 import { ISubscriptionsData } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
+import axios from "axios";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Copy, Link2, MoreHorizontal } from "lucide-react";
@@ -28,6 +31,9 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
   const updateSubscription = useMutation(api.subscriptions.updateSubscription);
 
+  const { activeUser } = useActiveUser();
+  const updateUser = useMutation(api.users.updateUser);
+
   const subscription = row.original as ISubscriptionsData;
 
   const [openAlertModal, setOpenAlertModal] = useState(false);
@@ -40,6 +46,7 @@ export function DataTableRowActions<TData>({
   };
 
   const onConnect = async () => {
+    if (!activeUser) return;
     if (!subscription) return;
 
     const toastId = toast.loading("Making as connected", {
@@ -56,6 +63,12 @@ export function DataTableRowActions<TData>({
         startTime: `${new Date()}`,
       });
 
+      // charge x amount from user
+      await updateUser({
+        id: activeUser._id,
+        balance: activeUser.balance - NOTIFICATION_CHARGE,
+      });
+
       // ==== 🔔 NOTIFY USER (Push Notification)
       if (subscription.user?.notificationSubscription) {
         await sendNotification({
@@ -66,15 +79,15 @@ export function DataTableRowActions<TData>({
       }
 
       // Email Notifications to user
-      // await axios.post(`/api/knock/device-connected-notification`, {
-      //   recipient_userId: subscription.user?._id,
-      //   recipient_email: subscription.user?.email,
-      //   recipient_username: subscription.user?.name,
-      //   devicename: subscription.device?.name,
-      //   macaddress: subscription.device?.macAddress,
-      //   wifiname: subscription.wifi?.name,
-      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions`,
-      // });
+      await axios.post(`/api/knock/device-connected-notification`, {
+        recipient_userId: subscription.user?._id,
+        recipient_email: subscription.user?.email,
+        recipient_username: subscription.user?.name,
+        devicename: subscription.device?.name,
+        macaddress: subscription.device?.macAddress,
+        wifiname: subscription.wifi?.name,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/subscriptions`,
+      });
 
       // success
       toast.success(`Connected successfully`, {

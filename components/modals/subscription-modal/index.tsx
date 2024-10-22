@@ -34,9 +34,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { useSubscriptionModal } from "@/hooks/modal-state/use-subscription-modal";
+import { NOTIFICATION_CHARGE } from "@/lib/constants";
 import { INetworksData } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Check, ChevronsUpDown, Loader } from "lucide-react";
@@ -54,6 +56,7 @@ const FormSchema = z.object({
 
 const SubscriptionModal = () => {
   const { isOpen, onClose } = useSubscriptionModal();
+  const updateUser = useMutation(api.users.updateUser);
   const createSubscription = useMutation(api.subscriptions.createSubscription);
 
   // networks
@@ -130,6 +133,12 @@ const SubscriptionModal = () => {
         status: "pending",
       });
 
+      // charge x amount from user (for notifications)
+      await updateUser({
+        id: activeUser._id,
+        balance: activeUser.balance - NOTIFICATION_CHARGE,
+      });
+
       // ==== 🔔 NOTIFY OWNER (Push Notification)
       const owner = selectedNetwork.owner;
       if (owner?.notificationSubscription) {
@@ -145,15 +154,15 @@ const SubscriptionModal = () => {
       }
 
       // Email Notifications to owner
-      // await axios.post(`/api/knock/new-connection-notification`, {
-      //   recipient_userId: selectedNetwork.owner?._id,
-      //   recipient_email: selectedNetwork.owner?.email,
-      //   recipient_username: selectedNetwork.owner?.name,
-      //   username: activeUser.name,
-      //   macaddress: selectedDevice.macAddress,
-      //   wifiname: selectedNetwork.name,
-      //   primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
-      // });
+      await axios.post(`/api/knock/new-connection-notification`, {
+        recipient_userId: selectedNetwork.owner?._id,
+        recipient_email: selectedNetwork.owner?.email,
+        recipient_username: selectedNetwork.owner?.name,
+        username: activeUser.name,
+        macaddress: selectedDevice.macAddress,
+        wifiname: selectedNetwork.name,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${selectedNetwork._id}`,
+      });
 
       // success
       toast.success(`Subscription created successfully`, {

@@ -14,7 +14,7 @@ import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useNetworkModal } from "@/hooks/modal-state/use-network-modal";
 import { Row } from "@tanstack/react-table";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Edit, MoreHorizontal, Settings, Trash } from "lucide-react";
 import Link from "next/link";
@@ -31,6 +31,9 @@ export function DataTableRowActions<TData>({
   const network = row.original as Doc<"wifis">;
   const { onOpen, setNetwork } = useNetworkModal();
   const deleteNetwork = useMutation(api.wifis.deleteWifi);
+  const wifiSubscriptions = useQuery(api.subscriptions.getWifisSubscriptions, {
+    wifi: network._id,
+  });
 
   const [openAlertModal, setOpenAlertModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -113,19 +116,23 @@ export function DataTableRowActions<TData>({
             Edit Network
           </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
-          <DropdownMenuItem
-            disabled={loading}
-            onClick={() => {
-              setOpenAlertModal(true);
-            }}
-            className="text-red-500"
-          >
-            Delete
-            <DropdownMenuShortcut>
-              <Trash size={14} />
-            </DropdownMenuShortcut>
-          </DropdownMenuItem>
+          {!wifiSubscriptions?.length && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                disabled={loading}
+                onClick={() => {
+                  setOpenAlertModal(true);
+                }}
+                className="text-red-500"
+              >
+                Delete
+                <DropdownMenuShortcut>
+                  <Trash size={14} />
+                </DropdownMenuShortcut>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

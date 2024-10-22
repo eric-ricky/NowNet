@@ -34,8 +34,8 @@ import { Input } from "../ui/input";
 
 const FormSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  rate: z.string().min(1, "Rate is required"),
-  location: z.string(),
+  speed: z.string().min(1, "Speed is required"),
+  rate: z.coerce.number().min(1, "Rate is required"),
 });
 
 const NetworkModal = () => {
@@ -52,8 +52,8 @@ const NetworkModal = () => {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: network?.name || "",
-      rate: network?.rate || "",
-      location: network?.location || "",
+      rate: network?.rate || 0,
+      speed: network?.speed || "",
     },
   });
 
@@ -66,7 +66,7 @@ const NetworkModal = () => {
     if (network?._id) {
       form.setValue("name", network.name);
       form.setValue("rate", network.rate);
-      form.setValue("location", network.location!);
+      form.setValue("speed", network.speed!);
 
       return;
     }
@@ -81,14 +81,14 @@ const NetworkModal = () => {
     });
 
     try {
-      const { name, location, rate } = formData;
+      const { name, speed, rate } = formData;
       if (!network) {
         const owner = activeUser._id;
         const newWifiId = await createWifiNetwork({
           name,
           owner,
           rate,
-          location,
+          speed,
         });
 
         // initiate earning
@@ -112,7 +112,7 @@ const NetworkModal = () => {
           owner: activeUser._id,
           name,
           rate,
-          location,
+          speed,
         });
       }
 
@@ -186,7 +186,11 @@ const NetworkModal = () => {
                       <FormLabel className="md:w-40">Rate Per Month</FormLabel>
                       <div className="flex-1">
                         <FormControl>
-                          <Input placeholder="Rate (per month)" {...field} />
+                          <Input
+                            type="number"
+                            placeholder="Rate (per month)"
+                            {...field}
+                          />
                         </FormControl>
 
                         <FormMessage />
@@ -198,15 +202,17 @@ const NetworkModal = () => {
                 <FormField
                   control={form.control}
                   disabled={isSubmitting}
-                  name="location"
+                  name="speed"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="md:w-40">
-                        Location (Optional)
-                      </FormLabel>
+                      <FormLabel className="md:w-40">Speed (Mbps)</FormLabel>
                       <div className="flex-1">
                         <FormControl>
-                          <Input placeholder="Location" {...field} />
+                          <Input
+                            type="number"
+                            placeholder="Speed in Mbps"
+                            {...field}
+                          />
                         </FormControl>
 
                         <FormMessage />

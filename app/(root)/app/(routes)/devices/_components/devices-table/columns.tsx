@@ -1,12 +1,11 @@
-import moment from "moment";
 import CustomTooltip from "@/components/global/custom-tooltip";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DataTableColumnHeader } from "@/components/ui/data-table-column-header";
-import { IUserDeviceData } from "@/lib/types";
-import { ColumnDef } from "@tanstack/react-table";
-import { FileText, Network } from "lucide-react";
-import Image from "next/image";
 import { Doc } from "@/convex/_generated/dataModel";
+import { ColumnDef } from "@tanstack/react-table";
+import { Network } from "lucide-react";
+import moment from "moment";
+import Image from "next/image";
 import { DataTableRowActions } from "./row-actions";
 
 export const columns: ColumnDef<Doc<"devices">>[] = [

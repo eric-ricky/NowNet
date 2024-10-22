@@ -165,6 +165,7 @@ export const getWifisSubscriptions = query({
     const subscriptions = await db
       .query("subscriptions")
       .withIndex("by_wifi", (q) => q.eq("wifi", wifi))
+      .filter((q) => q.eq(q.field("isActive"), true))
       .collect();
 
     const output = await Promise.all(

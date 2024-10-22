@@ -1,7 +1,6 @@
 import DataTable from "@/components/ui/data-table";
-import React from "react";
-import { columns } from "./columns";
 import { Doc } from "@/convex/_generated/dataModel";
+import { columns } from "./columns";
 
 interface IProps {
   loading: boolean;

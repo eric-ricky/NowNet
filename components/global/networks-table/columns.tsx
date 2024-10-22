@@ -78,11 +78,11 @@ export const columns: ColumnDef<INetworksData>[] = [
     },
   },
   {
-    accessorKey: "location",
+    accessorKey: "speed",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Location" />
+      <DataTableColumnHeader column={column} title="Speed" />
     ),
-    cell: ({ row }) => <div>{row.getValue("location") || "--"}</div>,
+    cell: ({ row }) => <div>{row.getValue("speed") || "--"}Mbps</div>,
   },
   {
     accessorKey: "createdAt",

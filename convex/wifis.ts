@@ -4,15 +4,15 @@ import { mutation, query } from "./_generated/server";
 export const createWifi = mutation({
   args: {
     name: v.string(), // should be unique
-    rate: v.string(),
-    location: v.optional(v.string()),
+    rate: v.number(),
+    speed: v.string(),
     owner: v.id("users"),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
-    const { name, owner, rate, location } = args;
+    const { name, owner, rate, speed } = args;
     const existingWifi = await db
       .query("wifis")
       .withIndex("by_name", (q) => q.eq("name", name))
@@ -24,7 +24,7 @@ export const createWifi = mutation({
       name,
       owner,
       rate,
-      location,
+      speed,
     });
 
     return newWifiId;
@@ -149,22 +149,22 @@ export const updateWifi = mutation({
   args: {
     id: v.id("wifis"),
     name: v.string(), // should be unique
-    rate: v.string(),
-    location: v.optional(v.string()),
+    rate: v.number(),
+    speed: v.string(),
     owner: v.id("users"),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
     if (!identity) throw new ConvexError("Unauthenticated");
 
-    const { id: wifiId, name, owner, rate, location } = args;
+    const { id: wifiId, name, owner, rate, speed } = args;
 
     const existingWifi = await db.get(wifiId);
     if (!existingWifi) throw new ConvexError("Device not found");
 
     await db.patch(wifiId, {
       name,
-      location,
+      speed,
       owner,
       rate,
     });

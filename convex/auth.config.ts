@@ -1,8 +1,8 @@
 const config = {
   providers: [
     {
-      // domain: "https://amazed-whippet-97.clerk.accounts.dev",
-      domain: "https://clerk.nownet.top",
+      domain: "https://fair-jawfish-26.clerk.accounts.dev",
+      // domain: "https://clerk.nownet.top",
       applicationID: "convex",
     },
   ],

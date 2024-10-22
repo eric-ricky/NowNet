@@ -18,8 +18,8 @@ export default defineSchema(
     }).index("by_email", ["email"]),
     wifis: defineTable({
       name: v.string(), // should be unique
-      rate: v.string(),
-      location: v.optional(v.string()),
+      rate: v.number(),
+      speed: v.string(), // Mbps
       owner: v.id("users"),
     })
       .searchIndex("search_name", {
