@@ -57,6 +57,7 @@ export default function RootLayout({
 
         <ConvexClientProvider>
           <ServiceWorkerProvider>
+            {/* . */}
             {/* <div>
             <section className="bg-gray-900 text-white">
               <div className="mx-auto max-w-screen-xl px-4 py-32 lg:flex lg:h-screen lg:items-center">
