@@ -1,6 +1,7 @@
 "use client";
 
 import Logo from "@/components/brand/logo";
+import Support from "@/components/global/support";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { useAdminAuthModal } from "@/hooks/modal-state/use-admin-auth-modal";
@@ -65,6 +66,10 @@ const Sidebar = ({ user }: { user: Doc<"users"> }) => {
               )}
             </>
           )}
+
+          <div className="mt-auto">
+            <Support />
+          </div>
         </div>
 
         <div className="flex flex-col 2xl:flex-row items-center gap-2">

@@ -103,7 +103,7 @@ const PushNotificationModal = ({ user }: { user: Doc<"users"> }) => {
   if (hideModal || !isSupported) return null;
 
   return (
-    <div className="fixed bottom-4 left-5 bg-white shadow-2xl border border-slate-400 rounded-xl p-4 flex flex-col gap-4 w-[320px] md:w-96">
+    <div className="fixed bottom-4 right-5 bg-white shadow-2xl border border-slate-400 rounded-xl p-4 flex flex-col gap-4 w-[320px] md:w-96">
       <BellRing size={32} className="text-blue-500 animate-bounce " />
 
       <div className="font-medium">Enable Notifications</div>

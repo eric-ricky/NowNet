@@ -1,6 +1,7 @@
 import Logo from "@/components/brand/logo";
 import NewUserComponent from "@/components/global/new-user";
 import NotificationFeed from "@/components/global/notification-feed";
+import Support from "@/components/global/support";
 import PushNotificationProvider from "@/components/providers/push-notification-provider";
 import { api } from "@/convex/_generated/api";
 import { UserButton } from "@clerk/nextjs";
@@ -62,6 +63,8 @@ const MainLayout = async ({ children }: PropsWithChildren) => {
           </div>
         </div>
       </PushNotificationProvider>
+
+      <Support isModal />
     </>
   );
 };

@@ -15,7 +15,7 @@ import { adminSidebarLinks, sidebarLinks } from "@/lib/data";
 import { cn } from "@/lib/utils";
 import { SignOutButton } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
-import { LogIn, LogOut, Menu } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -66,7 +66,7 @@ const MobileNav = ({ user }: { user: Doc<"users"> }) => {
                       />
                     ))}
 
-                    {admins?.find((admin) => admin.email === user.email) && (
+                    {/* {admins?.find((admin) => admin.email === user.email) && (
                       <Link
                         href={"/app/admin"}
                         className={cn(
@@ -77,7 +77,7 @@ const MobileNav = ({ user }: { user: Doc<"users"> }) => {
 
                         <p className="text-sm font-semibold">Admin Login</p>
                       </Link>
-                    )}
+                    )} */}
                   </>
                 )}
 

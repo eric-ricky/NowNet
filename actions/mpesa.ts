@@ -5,7 +5,7 @@ import { Buffer } from "buffer";
 
 const consumerKey = process.env.MPESA_CONSUMER_KEY;
 const consumerSecret = process.env.MPESA_CONSUMER_SECRET;
-const shortcode = process.env.MPESA_SHORTCODE;
+const shortcode = process.env.MPESA_PARENT_SHORTCODE;
 const tillNumber = process.env.MPESA_TILL_NUMBER;
 const passkey = process.env.MPESA_PASSKEY;
 const mpesaBaseUrl = process.env.MPESA_BASE_URL;

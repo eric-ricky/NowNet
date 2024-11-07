@@ -32,7 +32,7 @@ const WalletPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-4 p-4 md:p-8 md:max-w-[1000px]">
+      <div className="flex-1 flex flex-col gap-4 p-4 md:p-8 md:max-w-[1000px] pb-72">
         <div className="flex flex-col md:flex-row md:items-center  w-full gap-4">
           <Card className="sm:h-[240px] h-fit md:w-[500px] w-full bg-slate-100">
             <CardHeader className="text-center w-full">
