@@ -4,11 +4,11 @@ import Link from "next/link";
 
 const Navbar = () => {
   return (
-    <header className="py-10">
-      <div className="container mx-auto flex items-center justify-between">
+    <header className="h-20 flex items-stretch justify-center">
+      <div className="max-w-screen-xl mx-auto flex items-center justify-between flex-1 px-4 md:px-0">
         <Link
           href={"/"}
-          className="text-white font-ibm-plex-serif text-2xl font-bold tracking-[0.2em]"
+          className="font-ibm-plex-serif text-2xl font-bold tracking-[0.2em]"
         >
           NowneT.
         </Link>

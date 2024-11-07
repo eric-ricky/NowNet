@@ -121,6 +121,8 @@ const SubscriptionModal = () => {
         });
 
       const now = `${new Date()}`;
+
+      // create subscription and charge x amount from user (for notifications)
       await createSubscription({
         user: activeUser._id,
         wifi: selectedNetwork._id,
@@ -131,12 +133,8 @@ const SubscriptionModal = () => {
         endTime: undefined,
         amountConsumed: 0,
         status: "pending",
-      });
 
-      // charge x amount from user (for notifications)
-      await updateUser({
-        id: activeUser._id,
-        balance: activeUser.balance - NOTIFICATION_CHARGE,
+        notification_charge: NOTIFICATION_CHARGE,
       });
 
       // ==== 🔔 NOTIFY OWNER (Push Notification)

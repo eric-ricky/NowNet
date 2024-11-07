@@ -1,147 +1,174 @@
 "use client";
 
+import { checkTransactionStatus, initiateMpesaPayment } from "@/actions/mpesa";
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { usePaymentModal } from "@/hooks/modal-state/use-payment-modal";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Description } from "@radix-ui/react-dialog";
-import axios from "axios";
 import { useMutation } from "convex/react";
-import { ArrowRight, Loader, X } from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 import { Button } from "../ui/button";
 import { CardFooter } from "../ui/card";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogHeader,
   DialogOverlay,
   DialogTitle,
 } from "../ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "../ui/form";
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
+
+const formSchema = z.object({
+  phoneNumber: z
+    .string()
+    .min(10, "Phone number must be at least 10 digits")
+    .max(12, "Phone number must not exceed 12 digits")
+    .regex(
+      /^(?:254|\+254|0)?([71](?:(?:0[0-8])|(?:[12][0-9])|(?:9[0-9])|(?:4[0-36-9])|(?:5[0-7])|(?:6[0-7])|(?:8[0-2])|(?:3[0-9]))[0-9]{6})$/,
+      "Invalid Safaricom number"
+    ),
+  amount: z
+    .string()
+    .min(1, "Amount is required")
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) >= 1,
+      "Minimum amount is KES 1"
+    )
+    .refine(
+      (val) => !isNaN(Number(val)) && Number(val) <= 150000,
+      "Maximum amount is KES 150,000"
+    ),
+});
 
 const PaymentModal = () => {
   const { activeUser } = useActiveUser();
   const { isOpen, onClose } = usePaymentModal();
 
-  const createTopupTransaction = useMutation(
-    api.topuptransactions.createTopupTransaction
-  );
-  const deleteTransaction = useMutation(
-    api.topuptransactions.deleteTopupTransaction
-  );
-
-  const [amount, setAmount] = useState(5);
-  const [redirectUrl, setRedirectUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [paymentRef, setPaymentRef] = useState<Id<"topuptransactions">>();
+  const [checkingStatus, setCheckingStatus] = useState(false);
+  const [checkoutRequestId, setCheckoutRequestId] = useState("");
 
-  const handleCloseModal = async () => {
-    const toastId = toast.loading("Cancelling payment", {
-      id: "loadingCancellingPayment",
-      style: { color: "black" },
-      action: (
-        <X
-          size={20}
-          onClick={() => toast.dismiss("loadingCancellingPayment")}
-          className="ml-auto cursor-pointer"
-        />
-      ),
-    });
+  const createTransaction = useMutation(api.transactions.createTransaction);
 
-    try {
-      setLoading(true);
+  const form = useForm<z.infer<typeof formSchema>>({
+    mode: "onChange",
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      phoneNumber: "",
+      amount: "",
+    },
+  });
 
-      if (paymentRef) {
-        setRedirectUrl("");
-        setPaymentRef(undefined);
-        await deleteTransaction({
-          id: paymentRef,
-        });
+  useEffect(() => {
+    if (!checkoutRequestId) return;
+
+    const timer = setInterval(() => {
+      console.log("RUNNING CHECKPAYMENTSTATUS ====-------------");
+      checkPaymentStatus(checkoutRequestId);
+    }, 5000);
+
+    if (!checkoutRequestId) clearInterval(timer);
+
+    return () => clearInterval(timer);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkoutRequestId]);
+
+  const checkPaymentStatus = async (checkoutRequestId: string) => {
+    setCheckingStatus(true);
+    let attempts = 0;
+    const maxAttempts = 10;
+    const interval = 5000; // 5 seconds
+
+    const checkStatus = async () => {
+      if (attempts >= maxAttempts) {
+        setCheckingStatus(false);
+        toast.error(
+          "Payment verification timeout. If you completed the payment, it will be reflected shortly."
+        );
+        return;
       }
 
-      setRedirectUrl("");
-      setPaymentRef(undefined);
-      toast.dismiss(toastId);
+      const status = await checkTransactionStatus(checkoutRequestId);
 
-      console.log("CLOSING");
-      onClose();
-    } catch (error) {
-      console.log(error);
-      console.log("Error ====>", error);
-      toast.error("Error processing payment", {
-        id: toastId,
-        style: {
-          color: "red",
-        },
-      });
-    } finally {
-      setLoading(false);
-    }
+      console.log(attempts, "STATUS ====>", status);
+
+      if (status.requestSuccess) {
+        if (status.success) {
+          setCheckoutRequestId("");
+          toast.success("Payment completed successfully!");
+          form.reset();
+          setCheckingStatus(false);
+          onClose();
+        } else if (status.message.includes("pending")) {
+          attempts++;
+          setTimeout(checkStatus, interval);
+        } else {
+          setCheckoutRequestId("");
+          toast.error(status.message || "Payment failed", {
+            className: "text-red-500",
+          });
+          form.reset();
+          setCheckingStatus(false);
+        }
+      }
+    };
+
+    await checkStatus();
   };
 
-  const handleProcessPayment = async () => {
+  const handleCloseModal = () => {
+    form.reset();
+    onClose();
+  };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!activeUser) return;
-
-    if (!amount)
-      return toast.error("Please enter a valid amount", {
-        style: {
-          color: "red",
-        },
-      });
-
-    const toastId = toast.loading("Processing Payment", {
-      id: "loadingProcessingPayment",
-      style: { color: "black" },
-    });
+    setLoading(true);
 
     try {
-      setLoading(true);
-      // get payment Id
-      const paymentId = await createTopupTransaction({
-        amount: `${amount}`,
-        confirmation_code: "",
-        created_date: "",
-        currency: "",
-        description: "",
-        order_tracking_id: "",
-        payment_account: "",
-        payment_method: "",
-        payment_status_description: "Pending",
-        user: activeUser._id,
-      });
-      setPaymentRef(paymentId);
-      const data = await axios.post(`/api/payment/v2`, {
-        email: activeUser.email,
-        name: activeUser.name,
-        phone: activeUser.phone,
-        amount,
-        paymentId,
-        description: "NowNet Services Account Topup",
-      });
+      const response = await initiateMpesaPayment(
+        values.phoneNumber,
+        Number(values.amount)
+      );
 
-      if (data.data.data.error) throw new Error("Something went wrong");
+      if (response.success) {
+        toast.success("STK push sent! Please check your phone.");
+        console.log("RESPONSE ====>", response);
 
-      const { merchant_reference, redirect_url } = data.data.data;
-      setRedirectUrl(redirect_url);
+        // create a temporary transaction_record with reference
+        // then in the callbackurl update it with the status from the response
+        await createTransaction({
+          user: activeUser._id,
+          amount: Number(values.amount),
+          phoneNumber: values.phoneNumber,
+          reference: response.reference,
+          status: "PENDING",
+          timeStamp: new Date().toISOString(),
+          type: "DEPOSIT",
+        });
 
-      // setPaymentPayload({
-      //   merchant_reference,
-      //   order_tracking_id,
-      //   redirect_url,
-      // });
-      toast.dismiss(toastId);
+        setCheckingStatus(true);
+        setCheckoutRequestId(response.reference);
+      } else {
+        toast.error(response.message);
+      }
     } catch (error) {
-      console.log("Error ====>", error);
-      toast.error("Error processing payment", {
-        id: toastId,
-        style: {
-          color: "red",
-        },
-      });
+      toast.error("Failed to process payment. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -154,44 +181,65 @@ const PaymentModal = () => {
         className="bg-black-1/90"
       />
 
-      <DialogContent className="max-w-fit md:min-w-[700px] min-w-[90vw] p-0 rounded-md">
-        <DialogHeader className="px-4 py-4 border-b">
+      <DialogContent className="max-w-fit md:min-w-[550px] min-w-[90vw] p-0 rounded-md">
+        <DialogHeader className="px-4 py-8 border-b">
           <DialogTitle>Topup Account</DialogTitle>
           <Description className="hidden">Topup modal</Description>
         </DialogHeader>
 
-        {redirectUrl && (
-          <iframe
-            src={redirectUrl}
-            className="w-full h-full min-h-[70vh]"
-          ></iframe>
-        )}
-
-        {!redirectUrl && (
-          <div className="flex flex-col gap-10 p-10 w-full h-full">
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="amount">Enter Amount (KES)</Label>
-              <Input
-                placeholder="Amount(KES)"
-                min={1}
-                max={10000}
-                step={1}
-                value={amount}
-                onChange={(e) => setAmount(+e.target.value)}
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-4 p-4">
+              <FormField
+                control={form.control}
+                name="phoneNumber"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="254712345678" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount (KES)</FormLabel>
+                    <FormControl>
+                      <Input type="number" placeholder="1000" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
             </div>
 
-            <Button disabled={loading} onClick={handleProcessPayment}>
-              {loading && <Loader size={20} className="mr-2 animate-spin" />}
-              Continue {!loading && <ArrowRight size={20} className="ml-2" />}
-            </Button>
-          </div>
-        )}
+            <CardFooter className="border-t pt-4 flex items-center justify-end gap-4 text-sm italic">
+              <DialogClose asChild>
+                <Button type="button" variant="outline">
+                  Cancel
+                </Button>
+              </DialogClose>
 
-        <CardFooter className="border-t pt-2 flex items-center justify-center text-sm italic">
-          <span>Powered by</span>
-          <Image src="/images/pesapal.png" alt="." width={100} height={100} />
-        </CardFooter>
+              <Button type="submit" disabled={loading || checkingStatus}>
+                {loading ||
+                  (checkingStatus && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ))}
+
+                {loading
+                  ? "Initiating Payment..."
+                  : checkingStatus
+                    ? "Verifying Payment..."
+                    : "Continue"}
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

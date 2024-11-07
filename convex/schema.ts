@@ -57,40 +57,29 @@ export default defineSchema(
       note: v.optional(v.string()),
       transanctionReference: v.string(),
     }),
-    topuptransactions: defineTable({
+    transactions: defineTable({
       user: v.id("users"),
-      amount: v.string(),
-      confirmation_code: v.string(),
-      created_date: v.string(),
-      currency: v.string(),
-      description: v.string(),
-      order_tracking_id: v.string(),
-      payment_account: v.string(),
-      payment_method: v.string(),
-      payment_status_description: v.union(
-        v.literal("Invalid"),
-        v.literal("Completed"),
-        v.literal("Failed"),
-        v.literal("Reversed"),
-        v.literal("Pending")
-      ),
-    }).index("by_user", ["user"]),
-    widthrawaltransactions: defineTable({
-      user: v.id("users"),
-      total_amount: v.number(),
-      transaction_cost: v.number(),
-      total_payable: v.number(),
-      currency: v.string(),
-      description: v.string(),
-      payment_account: v.string(), // mpesa phone number to be paid to
-      payment_method: v.string(),
-      payment_status_description: v.union(
-        v.literal("Invalid"),
-        v.literal("Completed"),
-        v.literal("Failed"),
-        v.literal("Reversed"),
-        v.literal("Pending")
-      ),
+      amount: v.number(),
+      transanctionCost: v.optional(v.number()),
+      phoneNumber: v.string(),
+      type: v.union(v.literal("DEPOSIT"), v.literal("WITHDRAWAL")),
+      status: v.union(v.literal("PENDING"), v.literal("COMPLETED")),
+      reference: v.string(),
+      timeStamp: v.string(),
+      // confirmation_code: v.string(),
+      // created_date: v.string(),
+      // currency: v.string(),
+      // description: v.string(),
+      // order_tracking_id: v.string(),
+      // payment_account: v.string(),
+      // payment_method: v.string(),
+      // payment_status_description: v.union(
+      //   v.literal("Invalid"),
+      //   v.literal("Completed"),
+      //   v.literal("Failed"),
+      //   v.literal("Reversed"),
+      //   v.literal("Pending")
+      // ),
     }).index("by_user", ["user"]),
     earnings: defineTable({
       owner: v.id("users"),

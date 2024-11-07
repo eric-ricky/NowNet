@@ -27,8 +27,7 @@ import {
 const PaymentsPage = () => {
   const { upcomingPayouts } = useUpcomingPayouts();
   const { totalPaidOut } = useTotalPaidOut();
-  const { totalWidthrawn, totalUpcomingWidthrawal, totalWidthrawalTC } =
-    useWidthrawalRequestsStats();
+  const { totalWidthrawn } = useWidthrawalRequestsStats();
 
   return (
     <div className={cn(containerDivStyles)}>
@@ -43,8 +42,32 @@ const PaymentsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 md:p-8 pt-6 overflow-x-hidden">
-        {/* total paid out */}
+      <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 md:p-8 pt-6 overflow-x-hidden">
+        {/* total widthrawn */}
+        <Card className="col-span-2 sm:col-span-1">
+          <CardHeader className="w-full flex-row items-center justify-between">
+            <CardTitle className="text-sm">Total Widthrawn</CardTitle>
+            <CardDescription>
+              <CreditCard size={15} />
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="flex flex-col">
+            <CardTitle>
+              {totalWidthrawn !== undefined
+                ? formatToKES(totalWidthrawn)
+                : "--"}
+            </CardTitle>
+
+            <div className="flex items-center gap-1">
+              <p className="text-sm text-muted-foreground">
+                amount sent to users{" "}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* total past earnings */}
         <Card className="col-span-2 sm:col-span-1">
           <CardHeader className="w-full flex-row items-center justify-between">
             <CardTitle className="text-sm">Total Payouts</CardTitle>
@@ -54,7 +77,9 @@ const PaymentsPage = () => {
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalPaidOut)}</CardTitle>
+            <CardTitle>
+              {totalPaidOut !== undefined ? formatToKES(totalPaidOut) : "--"}
+            </CardTitle>
 
             <div className="flex items-center">
               <p className="text-green flex items-center text-sm text-green-500">
@@ -68,7 +93,7 @@ const PaymentsPage = () => {
           </CardContent>
         </Card>
 
-        {/* upcoming payouts */}
+        {/* upcoming earnings */}
         <Card className="col-span-2 sm:col-span-1">
           <CardHeader className="w-full flex-row items-center justify-between">
             <CardTitle className="text-sm">Upcoming Payouts</CardTitle>
@@ -78,7 +103,11 @@ const PaymentsPage = () => {
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(upcomingPayouts)}</CardTitle>
+            <CardTitle>
+              {upcomingPayouts !== undefined
+                ? formatToKES(upcomingPayouts)
+                : "--"}
+            </CardTitle>
 
             <div className="flex items-center gap-1">
               <p className="text-sm text-muted-foreground">upcoming on </p>
@@ -90,74 +119,10 @@ const PaymentsPage = () => {
           </CardContent>
         </Card>
 
-        {/* total widthrawn */}
-        <Card className="col-span-2 sm:col-span-1">
-          <CardHeader className="w-full flex-row items-center justify-between">
-            <CardTitle className="text-sm">Total Widthrawn</CardTitle>
-            <CardDescription>
-              <CreditCard size={15} />
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalWidthrawn)}</CardTitle>
-
-            <div className="flex items-center gap-1">
-              <p className="text-sm text-muted-foreground">
-                total real amount sent to users{" "}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* pending widthrawal */}
-        <Card className="col-span-2 sm:col-span-1">
-          <CardHeader className="w-full flex-row items-center justify-between">
-            <CardTitle className="text-sm">Upcoming Widthrawal</CardTitle>
-            <CardDescription>
-              <CreditCard size={15} />
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalUpcomingWidthrawal)}</CardTitle>
-
-            <div className="flex items-center gap-1">
-              <p className="text-sm text-muted-foreground">
-                total amount to be sent to users
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* transaction cost */}
-        <Card className="col-span-2 sm:col-span-1">
-          <CardHeader className="w-full flex-row items-center justify-between">
-            <CardTitle className="text-sm">Widthrawal TC</CardTitle>
-            <CardDescription>
-              <CreditCard size={15} />
-            </CardDescription>
-          </CardHeader>
-
-          <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalWidthrawalTC)}</CardTitle>
-
-            <div className="flex items-center gap-1">
-              <p className="text-sm text-muted-foreground">
-                Widthrawal transaction cost
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="col-span-2 grid gap-4 grid-cols-1">
+        <div className="col-span-3 grid gap-4 grid-cols-1">
           <Tabs defaultValue="upcoming">
             <div className="flex items-center flex-col sm:flex-row px-4 py-2 h-28">
-              <div className="flex items-center space-x-2 text-slate-500 text-sm font-medium">
-                <SquareChartGantt />
-              </div>
-
-              <TabsList className="ml-auto flex-wrap">
+              <TabsList className="mr-auto flex-wrap">
                 <TabsTrigger
                   value="upcoming"
                   className="text-zinc-600 dark:text-zinc-200 p-2"
@@ -179,18 +144,13 @@ const PaymentsPage = () => {
                   Widthrawal Requests
                 </TabsTrigger>
               </TabsList>
+
+              <div className="flex items-center space-x-2 text-slate-500 text-sm font-medium">
+                <SquareChartGantt />
+              </div>
             </div>
 
-            <Separator />
-
-            <TabsContent
-              value="widthrawal"
-              className="m-0 px-4 h-screen overflow-y-scroll scrollbar-thin"
-            >
-              <Loader2 className="animate-spin hidden last:flex" />
-
-              <AdminWidthrawalRequestCard />
-            </TabsContent>
+            <Separator className="mb-10" />
 
             <TabsContent
               value="upcoming"
@@ -204,6 +164,15 @@ const PaymentsPage = () => {
               className="m-0 px-4 h-screen overflow-y-scroll scrollbar-thin"
             >
               <AdminWifisEarningsCard isUpcoming={false} />
+            </TabsContent>
+
+            <TabsContent
+              value="widthrawal"
+              className="m-0 px-4 h-screen overflow-y-scroll scrollbar-thin"
+            >
+              <Loader2 className="animate-spin hidden last:flex" />
+
+              <AdminWidthrawalRequestCard />
             </TabsContent>
           </Tabs>
         </div>

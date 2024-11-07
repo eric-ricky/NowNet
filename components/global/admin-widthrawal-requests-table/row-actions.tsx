@@ -6,12 +6,12 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Id } from "@/convex/_generated/dataModel";
+import { ITransactions } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
@@ -26,14 +26,13 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const widthrawalRequest = row.original as Doc<"widthrawaltransactions">;
+  const widthrawalRequest = row.original as ITransactions;
 
-  const updateRequest = useMutation(
-    api.widthrawaltransactions.updateWidthrawalTransaction
-  );
+  const updateRequest = useMutation(api.transactions.updateTransaction);
+  const updateUser = useMutation(api.users.updateUser);
 
   const [openAlertModal, setOpenAlertModal] = useState(false);
-  const [action, setAction] = useState<"cancel" | "pay" | "reverse">();
+  const [action, setAction] = useState<"cancel" | "pay">();
   const [loading, setLoading] = useState(false);
 
   const onUpdate = async () => {
@@ -47,15 +46,43 @@ export function DataTableRowActions<TData>({
 
     try {
       setLoading(true);
+
+      const {
+        _creationTime,
+        _id,
+        amount,
+        phoneNumber,
+        reference,
+        status,
+        timeStamp,
+        type,
+        user,
+        transanctionCost,
+      } = widthrawalRequest;
+
+      // update request
       await updateRequest({
         id: widthrawalRequest._id,
-        payment_status_description:
-          action === "cancel"
-            ? "Invalid"
-            : action === "reverse"
-              ? "Reversed"
-              : "Completed",
+        user: widthrawalRequest.user?._id! as Id<"users">,
+        status: action === "pay" ? "COMPLETED" : "PENDING",
+        amount,
+        reference,
+        timeStamp,
+        transanctionCost,
+        type,
       });
+
+      // update user balance
+      if (action === "cancel") {
+        const amount = widthrawalRequest.amount;
+        const transactionsCost = widthrawalRequest.transanctionCost || 0;
+        await updateUser({
+          id: widthrawalRequest.user?._id! as Id<"users">,
+          balance:
+            widthrawalRequest.user?.balance! + (amount + transactionsCost),
+        });
+      }
+
       toast.success("Request updated successfully", {
         id: toastId,
         style: {
@@ -100,7 +127,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
 
         <DropdownMenuContent align="end" className="w-[180px]">
-          {widthrawalRequest.payment_status_description !== "Completed" && (
+          {widthrawalRequest.status === "PENDING" && (
             <DropdownMenuItem
               onClick={() => {
                 setAction("pay");
@@ -108,27 +135,12 @@ export function DataTableRowActions<TData>({
               }}
               className="flex items-center space-x-1 text-sm"
             >
-              <Banknote size={14} className="mr-1 text-muted-foreground" />
-              Mark as Paid
+              <Banknote className="size-5 mr-1 text-muted-foreground" />
+              Pay User
             </DropdownMenuItem>
           )}
 
-          {widthrawalRequest.payment_status_description === "Completed" && (
-            <DropdownMenuItem
-              onClick={() => {
-                setAction("reverse");
-                setOpenAlertModal(true);
-              }}
-              className="flex items-center space-x-1 text-sm"
-            >
-              <Banknote size={14} className="mr-1 text-muted-foreground" />
-              Reverse Payment
-            </DropdownMenuItem>
-          )}
-
-          <DropdownMenuSeparator />
-
-          {widthrawalRequest.payment_status_description === "Pending" && (
+          {widthrawalRequest.status === "COMPLETED" && (
             <DropdownMenuItem
               disabled={loading}
               onClick={() => {

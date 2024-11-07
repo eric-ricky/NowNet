@@ -9,7 +9,7 @@ const useTotalCommission = () => {
     adminEmail: activeUser?.email,
     isUpcoming: false,
   });
-  const [totalCommission, setTotalCommission] = useState(0);
+  const [totalCommission, setTotalCommission] = useState<number>();
 
   useEffect(() => {
     if (!pastEarnings) return;

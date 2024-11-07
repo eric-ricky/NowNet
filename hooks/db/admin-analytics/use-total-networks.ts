@@ -8,7 +8,7 @@ const useTotalNetworks = () => {
   const allNetworks = useQuery(api.wifis.getAllWifisAdmin, {
     adminEmail: activeUser?.email,
   });
-  const [totalNetworks, setTotalNetworks] = useState(0);
+  const [totalNetworks, setTotalNetworks] = useState<number>();
 
   useEffect(() => {
     if (!allNetworks) return;

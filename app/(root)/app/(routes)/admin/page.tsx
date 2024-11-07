@@ -59,7 +59,7 @@ const AdminPage = () => {
             <Users size={15} className="text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalUsers}</div>
+            <div className="text-2xl font-bold">{totalUsers || "--"}</div>
             <p className="text-xs text-muted-foreground">Total users</p>
           </CardContent>
         </Card>
@@ -73,7 +73,7 @@ const AdminPage = () => {
             <Wifi size={15} className="text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{totalNetworks}</div>
+            <div className="text-2xl font-bold">{totalNetworks || "--"}</div>
             <p className="text-xs text-muted-foreground">all wifi networks </p>
           </CardContent>
         </Card>
@@ -99,7 +99,9 @@ const AdminPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatToKES(totalCommission)}
+              {totalCommission !== undefined
+                ? formatToKES(totalCommission)
+                : "--"}
             </div>
             <p className="text-xs text-muted-foreground">
               total commission earned
@@ -128,7 +130,9 @@ const AdminPage = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatToKES(upcomingCommission)}
+              {upcomingCommission !== undefined
+                ? formatToKES(upcomingCommission)
+                : "--"}
             </div>
             <p className="text-xs text-muted-foreground">
               total commission earned
@@ -146,7 +150,9 @@ const AdminPage = () => {
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(totalPaidOut)}</CardTitle>
+            <CardTitle>
+              {totalPaidOut !== undefined ? formatToKES(totalPaidOut) : "--"}
+            </CardTitle>
 
             <div className="flex items-center">
               <p className="text-green flex items-center text-sm text-green-500">
@@ -170,7 +176,11 @@ const AdminPage = () => {
           </CardHeader>
 
           <CardContent className="flex flex-col">
-            <CardTitle>{formatToKES(upcomingPayouts)}</CardTitle>
+            <CardTitle>
+              {upcomingPayouts !== undefined
+                ? formatToKES(upcomingPayouts)
+                : "--"}
+            </CardTitle>
 
             <div className="flex items-center gap-1">
               <p className="text-sm text-muted-foreground">upcoming on </p>

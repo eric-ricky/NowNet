@@ -8,7 +8,7 @@ const useTotalUsers = () => {
   const allUsers = useQuery(api.users.getAllUsersAdmin, {
     adminEmail: activeUser?.email,
   });
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [totalUsers, setTotalUsers] = useState<number>();
 
   useEffect(() => {
     if (!allUsers) return;

@@ -1,28 +1,25 @@
 import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import useActiveUser from "../use-active-user";
 
 const useUpcomingPayouts = () => {
   const { activeUser } = useActiveUser();
-  const ownerUpcomingEarnings = useQuery(
-    api.earnings.getOwnersUpcomingEarnings,
-    {
-      owner: activeUser?._id as Id<"users">,
-    }
-  );
-  const [upcomingPayouts, setUpcomingPayouts] = useState(0);
+  const upcomingEarnings = useQuery(api.earnings.getAllEarningsAdmin, {
+    adminEmail: activeUser?.email,
+    isUpcoming: true,
+  });
+  const [upcomingPayouts, setUpcomingPayouts] = useState<number>();
 
   useEffect(() => {
-    if (!ownerUpcomingEarnings) return;
+    if (!upcomingEarnings) return;
 
-    const totalUpcomingEarnings = ownerUpcomingEarnings.reduce(
+    const totalUpcomingEarnings = upcomingEarnings.reduce(
       (total, curr) => total + curr.ownerEarnings,
       0
     );
     setUpcomingPayouts(totalUpcomingEarnings);
-  }, [ownerUpcomingEarnings]);
+  }, [upcomingEarnings]);
 
   return { upcomingPayouts };
 };

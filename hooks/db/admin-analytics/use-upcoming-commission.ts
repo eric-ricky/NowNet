@@ -9,7 +9,7 @@ const useUpcomingCommission = () => {
     adminEmail: activeUser?.email,
     isUpcoming: true,
   });
-  const [upcomingCommission, setUpcomingCommission] = useState(0);
+  const [upcomingCommission, setUpcomingCommission] = useState<number>();
 
   useEffect(() => {
     if (!upcomingEarnings) return;

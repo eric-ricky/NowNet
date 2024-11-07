@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} ${ibmPlexSerif.variable} !overflow-hidden`}
+        className={`${inter.className} ${ibmPlexSerif.variable} !overflow-x-hidden`}
       >
         <NextTopLoader
           color="rgb(46, 144, 250)"

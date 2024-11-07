@@ -12,8 +12,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
+import { NOTIFICATION_CHARGE } from "@/lib/constants";
 import { ISubscriptionsData } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
+import axios from "axios";
 import { useMutation, useQuery } from "convex/react";
 import { ConvexError } from "convex/values";
 import { Copy, Link2Off, MoreHorizontal, Trash } from "lucide-react";
@@ -128,9 +130,9 @@ export function DataTableRowActions<TData>({
     try {
       setLoading(true);
 
-      // create a new subscription
+      // create a new subscription and charge x for notification
       const now = `${new Date()}`;
-      const newWifiId = await createSubscription({
+      await createSubscription({
         user: user._id,
         wifi: wifi._id,
         device: device._id,
@@ -140,12 +142,25 @@ export function DataTableRowActions<TData>({
         endTime: undefined,
         amountConsumed: 0,
         status: "pending",
+
+        notification_charge: NOTIFICATION_CHARGE,
       });
 
       // update current one to isActive false
       await updateSubscription({
         id: subscription._id,
         isActive: false,
+      });
+
+      // Email Notifications to owner
+      await axios.post(`/api/knock/new-connection-notification`, {
+        recipient_userId: wifi.owner,
+        recipient_email: wifiOwner.email,
+        recipient_username: wifiOwner.name,
+        username: user.name,
+        macaddress: device.macAddress,
+        wifiname: wifi.name,
+        primary_action_url: `${process.env.NEXT_PUBLIC_SITE_URL}/app/networks/${wifi._id}`,
       });
 
       // TODO:

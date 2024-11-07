@@ -20,9 +20,8 @@ import type * as devices from "../devices.js";
 import type * as earnings from "../earnings.js";
 import type * as payments from "../payments.js";
 import type * as subscriptions from "../subscriptions.js";
-import type * as topuptransactions from "../topuptransactions.js";
+import type * as transactions from "../transactions.js";
 import type * as users from "../users.js";
-import type * as widthrawaltransactions from "../widthrawaltransactions.js";
 import type * as wifis from "../wifis.js";
 
 /**
@@ -40,9 +39,8 @@ declare const fullApi: ApiFromModules<{
   earnings: typeof earnings;
   payments: typeof payments;
   subscriptions: typeof subscriptions;
-  topuptransactions: typeof topuptransactions;
+  transactions: typeof transactions;
   users: typeof users;
-  widthrawaltransactions: typeof widthrawaltransactions;
   wifis: typeof wifis;
 }>;
 export declare const api: FilterApi<

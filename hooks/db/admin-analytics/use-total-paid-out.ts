@@ -5,21 +5,21 @@ import useActiveUser from "../use-active-user";
 
 const useTotalPaidOut = () => {
   const { activeUser } = useActiveUser();
-  const ownerPastEarnings = useQuery(api.earnings.getAllEarningsAdmin, {
+  const pastEarnings = useQuery(api.earnings.getAllEarningsAdmin, {
     adminEmail: activeUser?.email,
     isUpcoming: false,
   });
-  const [totalPaidOut, setTotalEarning] = useState(0);
+  const [totalPaidOut, setTotalEarning] = useState<number>();
 
   useEffect(() => {
-    if (!ownerPastEarnings) return;
+    if (!pastEarnings) return;
 
-    const totalPastEarnings = ownerPastEarnings.reduce(
+    const totalPastEarnings = pastEarnings.reduce(
       (total, curr) => total + curr.ownerEarnings,
       0
     );
     setTotalEarning(totalPastEarnings);
-  }, [ownerPastEarnings]);
+  }, [pastEarnings]);
 
   return { totalPaidOut };
 };

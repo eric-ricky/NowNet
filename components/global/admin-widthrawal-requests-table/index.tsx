@@ -1,10 +1,10 @@
 import DataTable from "@/components/ui/data-table";
-import { IWidthrawalRequestsData } from "@/lib/types";
+import { ITransactions } from "@/lib/types";
 import { columns } from "./columns";
 
 interface IProps {
   loading: boolean;
-  widthrawalRequests: IWidthrawalRequestsData[];
+  widthrawalRequests: ITransactions[];
 }
 
 const AdminWidthrawalRequestTable = ({

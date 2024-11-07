@@ -5,41 +5,31 @@ import useActiveUser from "../use-active-user";
 
 const useWidthrawalRequestsStats = () => {
   const { activeUser } = useActiveUser();
-  const widthrawaltransactions = useQuery(
-    api.widthrawaltransactions.getAllWidthrawalTransactionRequests,
-    {
-      adminEmail: activeUser?.email,
-    }
-  );
+  const transactions = useQuery(api.transactions.getWidthrawalTransactions, {
+    adminEmail: activeUser?.email!,
+  });
 
-  const [totalWidthrawn, setTotalWidthrawn] = useState(0);
-  const [totalUpcomingWidthrawal, setTotalUpcomingWidthrawal] = useState(0);
-  const [totalWidthrawalTC, setTotalWidthrawalTC] = useState(0);
+  const [totalWidthrawn, setTotalWidthrawn] = useState<number>(); // paid to users
+  const [totalUpcomingWidthrawal, setTotalUpcomingWidthrawal] =
+    useState<number>(); // pending
 
   useEffect(() => {
-    if (!widthrawaltransactions) return;
+    if (!transactions) return;
 
-    // transaction cost
-    const totalTransactionCost = widthrawaltransactions.reduce(
-      (prev, curr) => prev + curr.transaction_cost,
-      0
-    );
-    setTotalWidthrawalTC(totalTransactionCost);
+    // total paid to users
+    const totalSent = transactions
+      .filter((t) => t.status === "COMPLETED")
+      .reduce((acc, t) => acc + t.amount, 0);
+    setTotalWidthrawn(totalSent);
 
-    // total widthrawn
-    const totalWidthrawnAmount = widthrawaltransactions
-      .filter((t) => t.payment_status_description === "Completed")
-      .reduce((prev, curr) => prev + curr.total_payable, 0);
-    setTotalWidthrawn(totalWidthrawnAmount);
+    // total pending
+    const totalPending = transactions
+      .filter((t) => t.status === "PENDING")
+      .reduce((acc, t) => acc + t.amount, 0);
+    setTotalUpcomingWidthrawal(totalPending);
+  }, [transactions]);
 
-    // total upcoming widthrawals
-    const totalUpcomingWidthrawalAmount = widthrawaltransactions
-      .filter((t) => t.payment_status_description === "Pending")
-      .reduce((prev, curr) => prev + curr.total_payable, 0);
-    setTotalUpcomingWidthrawal(totalUpcomingWidthrawalAmount);
-  }, [widthrawaltransactions]);
-
-  return { totalWidthrawn, totalUpcomingWidthrawal, totalWidthrawalTC };
+  return { totalWidthrawn, totalUpcomingWidthrawal };
 };
 
 export default useWidthrawalRequestsStats;

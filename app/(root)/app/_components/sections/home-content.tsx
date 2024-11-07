@@ -1,6 +1,7 @@
 "use client";
 
 import UserSubscriptionsTable from "@/components/global/user-subscriptions-table";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,9 +12,10 @@ import {
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/convex/_generated/api";
 import useActiveUser from "@/hooks/db/use-active-user";
+import { useSubscriptionModal } from "@/hooks/modal-state/use-subscription-modal";
 import { formatToKES } from "@/lib/utils";
 import { useQuery } from "convex/react";
-import { CreditCard, Wallet } from "lucide-react";
+import { CreditCard, Plus, Wallet } from "lucide-react";
 
 const HomeContent = () => {
   const { activeUser } = useActiveUser();
@@ -25,6 +27,20 @@ const HomeContent = () => {
   const subscriptions = useQuery(api.subscriptions.getUsersSubscriptions, {
     user: activeUser?._id,
   });
+
+  // past subscriptions
+  const pastSubscriptions = useQuery(api.subscriptions.getUsersSubscriptions, {
+    user: activeUser?._id,
+    inActive: true,
+  });
+
+  const { onOpen: onOpenSubscriptionModal, setSubscription } =
+    useSubscriptionModal();
+
+  const onNewSubscription = () => {
+    setSubscription(undefined);
+    onOpenSubscriptionModal();
+  };
 
   return (
     <div className="flex-1 w-full space-y-4 p-4 md:p-8 pt-6">
@@ -50,7 +66,9 @@ const HomeContent = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatToKES(activeUser?.balance)}
+              {activeUser?.balance !== undefined
+                ? formatToKES(activeUser?.balance)
+                : "--"}
             </div>
             <p className="text-xs text-muted-foreground">
               current amount in your wallet
@@ -65,25 +83,58 @@ const HomeContent = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {formatToKES(totalAmountSpent)}
+              {totalAmountSpent !== undefined
+                ? formatToKES(totalAmountSpent)
+                : "--"}
             </div>
             <p className="text-xs text-muted-foreground">total amount spent</p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 grid-cols-1">
+      <div className="grid gap-8 grid-cols-1">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-xl">Active Connections</CardTitle>
-            <CardDescription className="text-xs">
-              Manage all your active connections
-            </CardDescription>
+          <CardHeader className="flex-row items-start justify-between mb-4">
+            <div className="space-y-2">
+              <CardTitle className="text-xl">Active Connections</CardTitle>
+              <CardDescription className="text-xs">
+                Manage all your active connections
+              </CardDescription>
+            </div>
+
+            <Button
+              onClick={onNewSubscription}
+              size={"sm"}
+              variant={"secondary"}
+            >
+              <Plus size={15} />
+            </Button>
           </CardHeader>
           <CardContent>
             <UserSubscriptionsTable
               subscriptions={subscriptions || []}
               loading={!subscriptions}
+            />
+          </CardContent>
+        </Card>
+
+        <Separator />
+
+        <Card
+          role="button"
+          aria-disabled
+          className="opacity-25 cursor-not-allowed"
+        >
+          <CardHeader>
+            <CardTitle className="text-xl">Past Connections</CardTitle>
+            <CardDescription className="text-xs">
+              Archived subscriptions
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <UserSubscriptionsTable
+              subscriptions={pastSubscriptions || []}
+              loading={!pastSubscriptions}
             />
           </CardContent>
         </Card>

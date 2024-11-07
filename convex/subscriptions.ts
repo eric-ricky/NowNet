@@ -16,6 +16,9 @@ export const createSubscription = mutation({
       v.literal("connected"),
       v.literal("disconnected")
     ),
+
+    notification_charge: v.number(),
+    isNew: v.optional(v.boolean()),
   },
   handler: async ({ auth, db }, args) => {
     const identity = await auth.getUserIdentity();
@@ -30,6 +33,9 @@ export const createSubscription = mutation({
       amountConsumed,
       isActive,
       status,
+
+      notification_charge,
+      isNew,
     } = args;
 
     // === check if user has juice 😂😀
@@ -44,19 +50,41 @@ export const createSubscription = mutation({
       (total, curr) => total + curr.amountConsumed,
       0
     );
-    const userCurrentBalance = userData.balance - totalConsumed;
+    const userCurrentBalance =
+      userData.balance - totalConsumed - notification_charge;
     if (userCurrentBalance < 1) {
-      throw new ConvexError(`Please top up your account to continue`);
+      throw new ConvexError(
+        `💸 Insufficient balance. Please top up your account to continue`
+      );
     }
 
     // === check if is an active connection (with the same device & wifi)
-    const existingActiveSubscription = await db
+    let existingActiveSubscription = await db
       .query("subscriptions")
       .withIndex("by_wifi", (q) => q.eq("wifi", wifi))
       .filter((q) =>
-        q.and(q.eq(q.field("device"), device), q.eq(q.field("isActive"), true))
+        q.and(
+          q.eq(q.field("device"), device),
+          q.eq(q.field("isActive"), true),
+          q.eq(q.field("status"), "connected")
+        )
       )
       .first();
+
+    // 💡 if isNew is true, then it's a new subscription, so we don't need to check for status 'connected'
+    if (isNew) {
+      existingActiveSubscription = await db
+        .query("subscriptions")
+        .withIndex("by_wifi", (q) => q.eq("wifi", wifi))
+        .filter((q) =>
+          q.and(
+            q.eq(q.field("device"), device),
+            q.eq(q.field("isActive"), true)
+          )
+        )
+        .first();
+    }
+
     if (existingActiveSubscription) {
       const wifiData = await db.get(wifi);
       const deviceData = await db.get(device);
@@ -78,7 +106,104 @@ export const createSubscription = mutation({
       status,
     });
 
+    // charge user for notification
+    await db.patch(user, { balance: userCurrentBalance });
+
     return newSubscriptionId;
+  },
+});
+
+export const markSubscriptionAsConnected = mutation({
+  args: {
+    id: v.id("subscriptions"),
+    startTime: v.optional(v.string()),
+    status: v.literal("connected"),
+
+    notification_charge: v.number(),
+  },
+  handler: async ({ auth, db }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
+
+    const {
+      id: subscriptionId,
+      status,
+      startTime,
+
+      notification_charge,
+    } = args;
+
+    const existingSubscription = await db.get(subscriptionId);
+    if (!existingSubscription) throw new ConvexError("Subscription not found");
+
+    // === check if user has juice 😂😀
+    const userData = await db.get(existingSubscription.user);
+    if (!userData) throw new ConvexError("No user was found");
+    const userSubscriptions = await db
+      .query("subscriptions")
+      .withIndex("by_user", (q) => q.eq("user", existingSubscription.user))
+      .filter((q) => q.eq(q.field("status"), "connected"))
+      .collect();
+    const totalConsumed = userSubscriptions.reduce(
+      (total, curr) => total + curr.amountConsumed,
+      0
+    );
+    const userCurrentBalance =
+      userData.balance - totalConsumed - notification_charge;
+    if (userCurrentBalance < 1) {
+      throw new ConvexError(`💸 User has insufficient balance.`);
+    }
+
+    // update status
+    await db.patch(subscriptionId, {
+      status: status || existingSubscription.status,
+      startTime: startTime || existingSubscription.startTime,
+    });
+
+    // charge user for notification
+    await db.patch(existingSubscription.user, { balance: userCurrentBalance });
+  },
+});
+
+export const updateSubscription = mutation({
+  args: {
+    id: v.id("subscriptions"),
+    startTime: v.optional(v.string()),
+    endTime: v.optional(v.string()),
+    amountConsumed: v.optional(v.number()),
+    isActive: v.optional(v.boolean()),
+    status: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("connected"),
+        v.literal("disconnected")
+      )
+    ),
+  },
+  handler: async ({ auth, db }, args) => {
+    const identity = await auth.getUserIdentity();
+    if (!identity) throw new ConvexError("Unauthenticated");
+
+    const {
+      id: subscriptionId,
+      status,
+      startTime,
+      amountConsumed,
+      isActive,
+      endTime,
+    } = args;
+
+    const existingSubscription = await db.get(subscriptionId);
+    if (!existingSubscription) throw new ConvexError("Subscription not found");
+
+    await db.patch(subscriptionId, {
+      status: status || existingSubscription.status,
+      startTime: startTime || existingSubscription.startTime,
+      amountConsumed: amountConsumed || existingSubscription.amountConsumed,
+      isActive:
+        isActive === undefined ? existingSubscription.isActive : isActive,
+      endTime: endTime || existingSubscription.endTime,
+    });
   },
 });
 
@@ -179,48 +304,6 @@ export const getWifisSubscriptions = query({
     );
 
     return output;
-  },
-});
-
-export const updateSubscription = mutation({
-  args: {
-    id: v.id("subscriptions"),
-    startTime: v.optional(v.string()),
-    endTime: v.optional(v.string()),
-    amountConsumed: v.optional(v.number()),
-    isActive: v.optional(v.boolean()),
-    status: v.optional(
-      v.union(
-        v.literal("pending"),
-        v.literal("connected"),
-        v.literal("disconnected")
-      )
-    ),
-  },
-  handler: async ({ auth, db }, args) => {
-    const identity = await auth.getUserIdentity();
-    if (!identity) throw new ConvexError("Unauthenticated");
-
-    const {
-      id: subscriptionId,
-      status,
-      startTime,
-      amountConsumed,
-      isActive,
-      endTime,
-    } = args;
-
-    const existingSubscription = await db.get(subscriptionId);
-    if (!existingSubscription) throw new ConvexError("Subscription not found");
-
-    await db.patch(subscriptionId, {
-      status: status || existingSubscription.status,
-      startTime: startTime || existingSubscription.startTime,
-      amountConsumed: amountConsumed || existingSubscription.amountConsumed,
-      isActive:
-        isActive === undefined ? existingSubscription.isActive : isActive,
-      endTime: endTime || existingSubscription.endTime,
-    });
   },
 });
 

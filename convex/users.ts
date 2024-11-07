@@ -109,7 +109,7 @@ export const updateUser = mutation({
   handler: async ({ db }, args) => {
     // get all users
     const user = await db.get(args.id);
-    if (!user) return;
+    if (!user) return console.log("NO USER");
 
     const { balance, name, avatarUrl, phone, notificationSubscription } = args;
     await db.patch(args.id, {

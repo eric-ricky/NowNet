@@ -15,7 +15,7 @@ import {
 import { Skeleton } from "../ui/skeleton";
 
 const UserTransactionHistory = () => {
-  const { transanctionHistory } = useUserTransactionHistory();
+  const { transanctions: transanctionHistory } = useUserTransactionHistory();
 
   if (transanctionHistory && !transanctionHistory.length) return null;
 
@@ -61,12 +61,13 @@ const UserTransactionHistory = () => {
               </div>
               <div className="flex-1 space-y-1">
                 <p className={"text-sm  font-bold leading-none text-blue-900 "}>
-                  {t.transaction_type === "topup" ? "TOPUP" : "WIDTHRAWAL"}
+                  {t.type}
                 </p>
                 <p className="text-xs md:text-sm text-muted-foreground flex items-center">
                   {moment(t._creationTime).format("ddd, MMM DD")}
                   <Dot size={10} />
-                  {t.payment_method}
+
+                  <span>MPESA</span>
                 </p>
               </div>
 
@@ -74,25 +75,23 @@ const UserTransactionHistory = () => {
                 <div
                   className={cn(
                     "font-semibold text-sm ",
-                    t.transaction_type === "topup"
-                      ? "text-slate-800"
-                      : "text-red-500"
+                    t.type === "DEPOSIT" ? "text-slate-800" : "text-red-500"
                   )}
                 >
-                  {t.transaction_type === "topup" ? "+" : "-"}
+                  {t.type === "DEPOSIT" ? "+" : "-"}
                   {formatToKES(+t.amount)}
                 </div>
                 <Badge
                   variant={
-                    t.payment_status_description === "Completed"
+                    t.status === "COMPLETED"
                       ? "connected"
-                      : t.payment_status_description === "Pending"
+                      : t.status === "PENDING"
                         ? "pending"
                         : "default"
                   }
                   className="text-xs w-fit px-2"
                 >
-                  {t.payment_status_description}
+                  {t.status}
                 </Badge>
               </div>
             </div>

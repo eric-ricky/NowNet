@@ -14,12 +14,11 @@ import { useQuery } from "convex/react";
 
 const AdminWidthrawalRequestCard = () => {
   const { activeUser } = useActiveUser();
-  const widthrawalRequests = useQuery(
-    api.widthrawaltransactions.getAllWidthrawalTransactionRequests,
-    {
-      adminEmail: activeUser?.email,
-    }
-  );
+  const transancations = useQuery(api.transactions.getWidthrawalTransactions, {
+    adminEmail: activeUser?.email!,
+  });
+
+  console.log("TRANSANCTIONS ====>", transancations);
 
   return (
     <Card>
@@ -31,8 +30,8 @@ const AdminWidthrawalRequestCard = () => {
       </CardHeader>
       <CardContent>
         <AdminWidthrawalRequestTable
-          widthrawalRequests={widthrawalRequests || []}
-          loading={!widthrawalRequests}
+          widthrawalRequests={transancations || []}
+          loading={!transancations}
         />
       </CardContent>
     </Card>

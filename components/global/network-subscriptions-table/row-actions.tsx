@@ -29,7 +29,9 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const updateSubscription = useMutation(api.subscriptions.updateSubscription);
+  const connectUser = useMutation(
+    api.subscriptions.markSubscriptionAsConnected
+  );
 
   const { activeUser } = useActiveUser();
   const updateUser = useMutation(api.users.updateUser);
@@ -57,16 +59,13 @@ export function DataTableRowActions<TData>({
     try {
       setLoading(true);
 
-      await updateSubscription({
+      // update and also charge x amount from user for notification
+      await connectUser({
         id: subscription._id,
         status: "connected",
         startTime: `${new Date()}`,
-      });
 
-      // charge x amount from user
-      await updateUser({
-        id: activeUser._id,
-        balance: activeUser.balance - NOTIFICATION_CHARGE,
+        notification_charge: NOTIFICATION_CHARGE,
       });
 
       // ==== 🔔 NOTIFY USER (Push Notification)

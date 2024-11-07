@@ -9,18 +9,6 @@ export interface IUserDeviceData {
   name: string;
 }
 
-// const d: Doc<"subscriptions"> = {
-//   user,
-//   wifi,
-//   device,
-//   _id,
-//   _creationTime,
-//   amountConsumed,
-//   isActive,
-//   startTime,
-//   endTime,
-// };
-
 export const subscriptionStatus = v.union(
   v.literal("pending"),
   v.literal("connected"),
@@ -62,39 +50,35 @@ export interface INetworksData {
   rate: number;
 }
 
-export const payment_status_description = v.union(
-  v.literal("Invalid"),
-  v.literal("Completed"),
-  v.literal("Failed"),
-  v.literal("Reversed"),
-  v.literal("Pending")
+export const transactionType = v.union(
+  v.literal("DEPOSIT"),
+  v.literal("WITHDRAWAL")
+);
+export const transactionStatus = v.union(
+  v.literal("PENDING"),
+  v.literal("COMPLETED")
 );
 
-export interface IWidthrawalRequestsData {
+export interface ITransactions {
+  // _id: Id<"transactions">;
+  // user: Doc<"users"> | null;
+  // _creationTime: number;
+  // amount: number;
+  // phoneNumber: string;
+  // reference: string;
+  // type: Infer<typeof transactionType>;
+  // status: Infer<typeof transactionStatus>;
+  // timeStamp: string;
+  // transanctionCost: number;
+
+  _id: Id<"transactions">;
+  _creationTime: number;
+  transanctionCost?: number | undefined;
+  type: Infer<typeof transactionType>;
   user: Doc<"users"> | null;
-  _id: Id<"widthrawaltransactions">;
-  _creationTime: number;
-  currency: string;
-  description: string;
-  payment_account: string;
-  payment_method: string;
-  payment_status_description: Infer<typeof payment_status_description>;
-  total_amount: number;
-  total_payable: number;
-  transaction_cost: number;
-}
-
-// const d:Doc<'widthrawaltransactions'>
-
-export interface ITransactionHistory {
-  _id: string;
-  _creationTime: number;
+  status: Infer<typeof transactionStatus>;
   amount: number;
-  currency: string;
-  description: string;
-  payment_account: string;
-  payment_method: string;
-  payment_status_description: string;
-  transaction_type: "topup" | "widthrawal";
-  user: string;
+  phoneNumber: string;
+  reference: string;
+  timeStamp: string;
 }
