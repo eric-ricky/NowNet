@@ -42,8 +42,10 @@ export const createTransaction = mutation({
     });
 
     // update user balance
-    const tc = transanctionCost || 0;
-    await db.patch(user, { balance: userData.balance - (amount + tc) });
+    if (type === "WITHDRAWAL") {
+      const tc = transanctionCost || 0;
+      await db.patch(user, { balance: userData.balance - (amount + tc) });
+    }
 
     return newTransactionId;
   },

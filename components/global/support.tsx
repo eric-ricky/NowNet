@@ -24,7 +24,7 @@ const Support = ({
     return (
       <div
         className={cn(
-          "fixed bottom-4 right-5 flex items-start gap-2 w-[90%] h-72 overflow-hidden",
+          "md:hidden fixed bottom-4 right-5 flex items-start gap-2 w-[90%] h-72 overflow-hidden",
           {
             "h-fit w-fit bg-green-500 rounded-full shadow-xl": !isOpen,
           },

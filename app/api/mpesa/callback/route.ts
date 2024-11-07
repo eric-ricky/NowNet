@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     if (resultCode === 0) {
       // Payment was successful
       if (transaction) {
+        console.log("✅📅📅📅TRANSACTION...", transaction);
         console.log("✅✅UPDATING TRANSACTION...");
         await client.mutation(api.transactions.updateTransaction, {
           id: transaction._id,
@@ -37,6 +38,7 @@ export async function POST(req: NextRequest) {
         });
 
         // update user balance
+        console.log("✅✅UPDATING USER BALANCE...");
         await client.mutation(api.users.updateUser, {
           id: transaction.user?._id as Id<"users">,
           balance: transaction.user?.balance! + transaction.amount!,

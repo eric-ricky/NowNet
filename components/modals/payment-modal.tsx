@@ -2,6 +2,7 @@
 
 import { checkTransactionStatus, initiateMpesaPayment } from "@/actions/mpesa";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 import useActiveUser from "@/hooks/db/use-active-user";
 import { usePaymentModal } from "@/hooks/modal-state/use-payment-modal";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -61,8 +62,10 @@ const PaymentModal = () => {
   const [loading, setLoading] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
   const [checkoutRequestId, setCheckoutRequestId] = useState("");
+  const [transactionId, setTransanctionId] = useState<Id<"transactions">>();
 
   const createTransaction = useMutation(api.transactions.createTransaction);
+  const deleteTransaction = useMutation(api.transactions.deleteTransaction);
 
   const form = useForm<z.infer<typeof formSchema>>({
     mode: "onChange",
@@ -122,6 +125,10 @@ const PaymentModal = () => {
           toast.error(status.message || "Payment failed", {
             className: "text-red-500",
           });
+          if (transactionId)
+            await deleteTransaction({
+              id: transactionId,
+            });
           form.reset();
           setCheckingStatus(false);
         }
@@ -138,6 +145,7 @@ const PaymentModal = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!activeUser) return;
+    setTransanctionId(undefined);
     setLoading(true);
 
     try {
@@ -152,7 +160,7 @@ const PaymentModal = () => {
 
         // create a temporary transaction_record with reference
         // then in the callbackurl update it with the status from the response
-        await createTransaction({
+        const transId: Id<"transactions"> = await createTransaction({
           user: activeUser._id,
           amount: Number(values.amount),
           phoneNumber: values.phoneNumber,
@@ -162,6 +170,7 @@ const PaymentModal = () => {
           type: "DEPOSIT",
         });
 
+        setTransanctionId(transId);
         setCheckingStatus(true);
         setCheckoutRequestId(response.reference);
       } else {
