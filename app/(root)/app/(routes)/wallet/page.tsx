@@ -1,7 +1,6 @@
 "use client";
 
 import PaymentTopupButton from "@/components/global/payment-button/topup";
-import PaymentWidthrawButton from "@/components/global/payment-button/widthraw";
 import UserTransactionHistory from "@/components/global/user-transaction-history";
 import {
   Card,
@@ -42,7 +41,6 @@ const WalletPage = () => {
 
             <CardFooter className="max-w-[380px] mx-auto flex flex-col gap-4 md:p-0">
               <PaymentTopupButton />
-              <PaymentWidthrawButton />
             </CardFooter>
           </Card>
 
@@ -66,7 +64,7 @@ const WalletPage = () => {
           </Card>
         </div>
 
-        <UserTransactionHistory />
+        <UserTransactionHistory type="DEPOSIT" />
       </div>
     </div>
   );

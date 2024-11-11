@@ -6,7 +6,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { api } from "@/convex/_generated/api";
@@ -15,7 +14,7 @@ import { ITransactions } from "@/lib/types";
 import { Row } from "@tanstack/react-table";
 import { useMutation } from "convex/react";
 import { ConvexError } from "convex/values";
-import { Banknote, MoreHorizontal, Trash } from "lucide-react";
+import { Banknote, MoreHorizontal } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -140,7 +139,7 @@ export function DataTableRowActions<TData>({
             </DropdownMenuItem>
           )}
 
-          {widthrawalRequest.status === "COMPLETED" && (
+          {/* {widthrawalRequest.status === "COMPLETED" && (
             <DropdownMenuItem
               disabled={loading}
               onClick={() => {
@@ -154,7 +153,7 @@ export function DataTableRowActions<TData>({
                 <Trash size={14} />
               </DropdownMenuShortcut>
             </DropdownMenuItem>
-          )}
+          )} */}
         </DropdownMenuContent>
       </DropdownMenu>
     </>

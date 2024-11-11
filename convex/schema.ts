@@ -14,6 +14,7 @@ export default defineSchema(
       avatarUrl: v.optional(v.string()),
       phone: v.optional(v.string()),
       balance: v.number(),
+      earnings: v.number(),
       notificationSubscription: v.optional(v.string()),
     }).index("by_email", ["email"]),
     wifis: defineTable({

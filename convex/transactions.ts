@@ -41,10 +41,11 @@ export const createTransaction = mutation({
       transanctionCost,
     });
 
-    // update user balance
+    // update user earnings
     if (type === "WITHDRAWAL") {
       const tc = transanctionCost || 0;
-      await db.patch(user, { balance: userData.balance - (amount + tc) });
+      const earnings = userData.earnings || 0;
+      await db.patch(user, { earnings: earnings - (amount + tc) });
     }
 
     return newTransactionId;

@@ -15,7 +15,7 @@ const Navbar = () => {
 
         <div className="">
           <Link href={"/app"}>
-            <Button className="uppercase bg-transparent md:bg-slate-100 hover:bg-slate-200 tracking-tight font-semibold px-0 md:px-8 text-slate-100 md:text-black-1">
+            <Button className="uppercase bg-transparent md:bg-slate-100 hover:bg-slate-200 tracking-tight font-semibold px-0 md:px-8 text-black-1">
               <span className="hidden md:flex">Sign In</span>
               <LogIn className="flex md:hidden" />
             </Button>

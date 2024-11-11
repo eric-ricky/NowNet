@@ -9,6 +9,8 @@ export const createUser = mutation({
     avatarUrl: v.optional(v.string()),
     phone: v.optional(v.string()),
     balance: v.number(),
+    earnings: v.number(),
+
     notificationSubscription: v.optional(v.string()),
   },
   handler: async ({ auth, db }, args) => {
@@ -17,6 +19,7 @@ export const createUser = mutation({
 
     const {
       balance,
+      earnings,
       email,
       name,
       uid,
@@ -32,6 +35,7 @@ export const createUser = mutation({
 
     const newUserId = await db.insert("users", {
       balance,
+      earnings,
       email,
       name,
       uid,
@@ -104,6 +108,7 @@ export const updateUser = mutation({
     avatarUrl: v.optional(v.string()),
     phone: v.optional(v.string()),
     balance: v.optional(v.number()),
+    earnings: v.optional(v.number()),
     notificationSubscription: v.optional(v.string()),
   },
   handler: async ({ db }, args) => {
@@ -111,7 +116,14 @@ export const updateUser = mutation({
     const user = await db.get(args.id);
     if (!user) return console.log("NO USER");
 
-    const { balance, name, avatarUrl, phone, notificationSubscription } = args;
+    const {
+      balance,
+      earnings,
+      name,
+      avatarUrl,
+      phone,
+      notificationSubscription,
+    } = args;
     await db.patch(args.id, {
       balance: balance || user.balance,
       name: name || user.name,

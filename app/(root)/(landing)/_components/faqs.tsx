@@ -3,8 +3,7 @@ import { Accordion, AccordionItem } from "@/components/ui/accordion";
 const faqQuestions = [
   {
     question: "How do I find and connect to a Nownet provider?",
-    answer:
-      "Simply download our app, search for available Wi-Fi nearby, and tap to connect.",
+    answer: "Simply search for available Wi-Fi nearby, and tap to connect.",
   },
   {
     question: "How much does it cost to use Nownet?",

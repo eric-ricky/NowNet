@@ -111,14 +111,9 @@ const WidthrawalModal = () => {
 
       console.log("TOTAL_AMOUNT 2 ===>", total_amount);
 
-      // check if there are active subscriptions that will be affected by the widthrawal request
-
-      // OR
-
-      // User should disconnect all subscriptions before widthrawing
-
       // Check user balance before creating transaction
-      if (activeUser.balance < total_amount) {
+      const earnings = activeUser.earnings || 0;
+      if (earnings < total_amount) {
         toast.error("Insufficient balance", {
           id: toastId,
         });

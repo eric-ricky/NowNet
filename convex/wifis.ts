@@ -162,6 +162,14 @@ export const updateWifi = mutation({
     const existingWifi = await db.get(wifiId);
     if (!existingWifi) throw new ConvexError("Device not found");
 
+    // check subscriptions
+    const subscription = await db
+      .query("subscriptions")
+      .withIndex("by_wifi", (q) => q.eq("wifi", args.id))
+      .first();
+    if (subscription)
+      throw new ConvexError("Cannot modify network with subscriptions");
+
     await db.patch(wifiId, {
       name,
       speed,

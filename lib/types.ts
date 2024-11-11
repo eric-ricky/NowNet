@@ -59,24 +59,16 @@ export const transactionStatus = v.union(
   v.literal("COMPLETED")
 );
 
-export interface ITransactions {
-  // _id: Id<"transactions">;
-  // user: Doc<"users"> | null;
-  // _creationTime: number;
-  // amount: number;
-  // phoneNumber: string;
-  // reference: string;
-  // type: Infer<typeof transactionType>;
-  // status: Infer<typeof transactionStatus>;
-  // timeStamp: string;
-  // transanctionCost: number;
+export type ITransactionType = Infer<typeof transactionType>;
+export type ITransactionStatus = Infer<typeof transactionStatus>;
 
+export interface ITransactions {
   _id: Id<"transactions">;
   _creationTime: number;
   transanctionCost?: number | undefined;
-  type: Infer<typeof transactionType>;
+  type: ITransactionType;
   user: Doc<"users"> | null;
-  status: Infer<typeof transactionStatus>;
+  status: ITransactionStatus;
   amount: number;
   phoneNumber: string;
   reference: string;

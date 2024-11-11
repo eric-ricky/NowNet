@@ -91,6 +91,7 @@ const NewUserComponent = ({
         name: `${firstname} ${lastname}`,
         phone,
         balance: 0,
+        earnings: 0,
       });
 
       await axios.post(`/api/knock/welcome-notification`, {

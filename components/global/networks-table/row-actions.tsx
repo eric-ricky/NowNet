@@ -106,15 +106,19 @@ export function DataTableRowActions<TData>({
             </DropdownMenuItem>
           </Link>
 
-          <DropdownMenuSeparator />
+          {!wifiSubscriptions?.length && (
+            <>
+              <DropdownMenuSeparator />
 
-          <DropdownMenuItem
-            className="flex items-center space-x-1 text-sm"
-            onClick={onUpdate}
-          >
-            <Edit size={14} className="mr-1 text-muted-foreground" />
-            Edit Network
-          </DropdownMenuItem>
+              <DropdownMenuItem
+                className="flex items-center space-x-1 text-sm"
+                onClick={onUpdate}
+              >
+                <Edit size={14} className="mr-1 text-muted-foreground" />
+                Edit Network
+              </DropdownMenuItem>
+            </>
+          )}
 
           {!wifiSubscriptions?.length && (
             <>

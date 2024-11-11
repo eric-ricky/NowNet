@@ -162,7 +162,7 @@ export const getAllEarningsAdmin = query({
 /** Pay the user
  * (update isUpcoming:false;
  * create a new earning;
- * and deposit to user balance)
+ * and deposit to user.earnings)
  */
 export const payEarning = mutation({
   args: {
@@ -194,8 +194,9 @@ export const payEarning = mutation({
     await db.patch(earning._id, {
       isUpcoming: false,
     });
+
     await db.patch(owner._id, {
-      balance: owner.balance + earning.ownerEarnings,
+      earnings: owner.earnings + earning.ownerEarnings,
     });
     await db.insert("earnings", {
       wifi: earning.wifi,

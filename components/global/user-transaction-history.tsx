@@ -1,6 +1,7 @@
 "use client";
 
 import useUserTransactionHistory from "@/hooks/db/user-analytics/use-user-transaction-history";
+import { ITransactionType } from "@/lib/types";
 import { cn, formatToKES } from "@/lib/utils";
 import { Dot, Store } from "lucide-react";
 import moment from "moment";
@@ -14,13 +15,19 @@ import {
 } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 
-const UserTransactionHistory = () => {
+const UserTransactionHistory = ({
+  type,
+  className,
+}: {
+  type: ITransactionType;
+  className?: string;
+}) => {
   const { transanctions: transanctionHistory } = useUserTransactionHistory();
 
   if (transanctionHistory && !transanctionHistory.length) return null;
 
   return (
-    <Card className="w-full">
+    <Card className={cn("w-full", className)}>
       <CardHeader className="p-2.5 md:p-4">
         <CardTitle className="text-base md:text-xl">
           Transaction History
@@ -51,51 +58,55 @@ const UserTransactionHistory = () => {
           ))}
 
         {transanctionHistory &&
-          transanctionHistory.map((t) => (
-            <div
-              key={t._id}
-              className="flex items-center space-x-4 rounded-md border p-2 md:p-4"
-            >
-              <div className="bg-blue-700 text-slate-50 w-10 h-10 rounded-full grid place-items-center">
-                <Store size={20} />
-              </div>
-              <div className="flex-1 space-y-1">
-                <p className={"text-sm  font-bold leading-none text-blue-900 "}>
-                  {t.type}
-                </p>
-                <p className="text-xs md:text-sm text-muted-foreground flex items-center">
-                  {moment(t._creationTime).format("ddd, MMM DD")}
-                  <Dot size={10} />
-
-                  <span>MPESA</span>
-                </p>
-              </div>
-
-              <div className="flex flex-col items-end">
-                <div
-                  className={cn(
-                    "font-semibold text-sm ",
-                    t.type === "DEPOSIT" ? "text-slate-800" : "text-red-500"
-                  )}
-                >
-                  {t.type === "DEPOSIT" ? "+" : "-"}
-                  {formatToKES(+t.amount)}
+          transanctionHistory
+            .filter((t) => t.type === type)
+            .map((t) => (
+              <div
+                key={t._id}
+                className="flex items-center space-x-4 rounded-md border p-2 md:p-4"
+              >
+                <div className="bg-blue-700 text-slate-50 w-10 h-10 rounded-full grid place-items-center">
+                  <Store size={20} />
                 </div>
-                <Badge
-                  variant={
-                    t.status === "COMPLETED"
-                      ? "connected"
-                      : t.status === "PENDING"
-                        ? "pending"
-                        : "default"
-                  }
-                  className="text-xs w-fit px-2"
-                >
-                  {t.status}
-                </Badge>
+                <div className="flex-1 space-y-1">
+                  <p
+                    className={"text-sm  font-bold leading-none text-blue-900 "}
+                  >
+                    {t.type}
+                  </p>
+                  <p className="text-xs md:text-sm text-muted-foreground flex items-center">
+                    {moment(t._creationTime).format("ddd, MMM DD")}
+                    <Dot size={10} />
+
+                    <span>MPESA</span>
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-end">
+                  <div
+                    className={cn(
+                      "font-semibold text-sm ",
+                      t.type === "DEPOSIT" ? "text-slate-800" : "text-red-500"
+                    )}
+                  >
+                    {t.type === "DEPOSIT" ? "+" : "-"}
+                    {formatToKES(+t.amount)}
+                  </div>
+                  <Badge
+                    variant={
+                      t.status === "COMPLETED"
+                        ? "connected"
+                        : t.status === "PENDING"
+                          ? "pending"
+                          : "default"
+                    }
+                    className="text-xs w-fit px-2"
+                  >
+                    {t.status}
+                  </Badge>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
       </CardContent>
     </Card>
   );
